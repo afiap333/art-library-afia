@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--#6=-nbzpzjumwl0-+ku%+xh+(c6x558@l7wemgpy%tnysl(*t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["https://art-library-871f7414fac3.herokuapp.com/artlibrary"]
 
 
 # Application definition
