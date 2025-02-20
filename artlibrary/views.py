@@ -6,9 +6,16 @@ from .forms import AddArtSupplyForm
 
 def index(request):
     return render(request,'artlibrary/index.html')
+
+def store_user_role(request):
+    role=request.GET.get('role')
+    request.session['user_role']=role
+    return redirect('account_login')
 def login_redirect(request):
-    #user=request.user
-    return redirect(resolve_url('librarian_page'))
+   user=request.user
+   if user.user_role=='librarian':
+       return redirect("librarian")
+   return redirect('patron')
 
 def librarian_page(request):
     add_item_form = AddArtSupplyForm()

@@ -13,10 +13,10 @@
     <p class="display-1 p-4">Art Library</p>
     <div class="container p-4 text-center">
         <li>
-            <a href="{% url 'account_login' %}">Login as Patron</a>
+            <a href="{% url 'select-role' %}?role=patron">Login as Patron</a>
         </li>
         <li>
-            <a href="{% url 'account_login' %}">Login as Librarian</a>
+            <a href="{% url 'select-role' %}?role=librarian">Login as Librarian</a>
         </li>
     </div>
     <script src="{% static 'js/bootstrap.js' %}"></script>
