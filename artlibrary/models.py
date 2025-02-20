@@ -1,30 +1,26 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
-class Patron(models.Model):
-    patron_name=models.CharField(max_length=200)
-    patron_date_joined=models.DateTimeField("date joined",auto_now_add=True)
-    def get_name(self):
-        return self.patron_name
-
-class Librarian(models.Model):
-    librarian_name=models.CharField(max_length=200)
-    librarian_date_joined=models.DateTimeField("date joined",auto_now_add=True)
-    def get_name(self):
-        return self.librarian_name
+class CustomUser(AbstractUser):
+    roles=(('patron','Patron'),('librarian','Librarian'),)
+    user_role=models.CharField(max_length=12,choices=roles, default='patron')
+    def librarian_check(self):
+        return self.user_role=='librarian'
+    def is_patron(self):
+        return self.user_role=='patron'
 
 class ArtSupply(models.Model):
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='art_supplies/')
     quantity = models.PositiveIntegerField()
     pickup_location = models.CharField(max_length=255)
-    added_by = models.ForeignKey(Librarian, on_delete=models.CASCADE)
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
 class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_messages")
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="received_messages")
     subject = models.CharField(max_length=255)
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
