@@ -1,0 +1,79 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patron Dashboard</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body class="bg-light">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Patron Page</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="text-center">Welcome, Patron!</h1>
+        <p class="text-center">Explore and Borrow Art Supplies</p>
+
+        <div class="row">
+            <!-- Available Art Supplies -->
+            <div class="col-md-8">
+                <h3>Available Art Supplies</h3>
+                <div class="row">
+                    {% for item in available_items %}
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">Quantity: {{ item.quantity }}</p>
+                                <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                                <a href="{% url 'borrow_item' item.id %}" class="btn btn-primary">Borrow</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No Art Supplies Currently Available</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div class="col-md-4">
+                <h3>Messages</h3>
+                <div class="list-group">
+                    {% for message in messages %}
+                    <div class="list-group-item">
+                        <strong>From: {{ message.sender }}</strong>
+                        <p>{{ message.content }}</p>
+                        <small class="text-muted">{{ message.timestamp }}</small>
+                    </div>
+                    {% empty %}
+                    <p>No Messages</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
