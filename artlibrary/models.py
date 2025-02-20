@@ -5,11 +5,15 @@ from django.contrib.auth.models import User
 
 class Patron(models.Model):
     patron_name=models.CharField(max_length=200)
-    patron_date_joined=models.DateTimeField("date joined")
+    patron_date_joined=models.DateTimeField("date joined",auto_now_add=True)
+    def get_name(self):
+        return self.patron_name
 
 class Librarian(models.Model):
     librarian_name=models.CharField(max_length=200)
-    librarian_date_joined=models.DateTimeField("date joined")
+    librarian_date_joined=models.DateTimeField("date joined",auto_now_add=True)
+    def get_name(self):
+        return self.librarian_name
 
 class ArtSupply(models.Model):
     name = models.CharField(max_length=255)

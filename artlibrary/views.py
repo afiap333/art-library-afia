@@ -1,10 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render,resolve_url
 from django.http import HttpResponse
 from .models import ArtSupply, Message
+from django.shortcuts import redirect
 from .forms import AddArtSupplyForm
 
-def index(request):
-    return HttpResponse("You're at the library homepage")
+def index():
+    return render(request,'artlibrary/index.html')
+def login_redirect(request):
+    #user=request.user
+    return redirect(resolve_url('librarian_page'))
 
 def librarian_page(request):
     add_item_form = AddArtSupplyForm()
