@@ -1,6 +1,6 @@
 from django.shortcuts import render,resolve_url
 from django.http import HttpResponse
-from .models import ArtSupply, Message
+from .models import ArtSupply, Message, Patron
 from django.shortcuts import redirect
 from .forms import AddArtSupplyForm
 
@@ -22,3 +22,15 @@ def librarian_page(request):
     }
     
     return render(request, 'artlibrary/librarian.html', context)
+
+
+def patron_page(request):
+    available_items = ArtSupply.objects.all()
+    messages = Message.objects.filter(recipient=request.user)
+
+    context = {
+        'available_items': available_items,
+        'messages': messages,
+    }
+
+    return render(request, 'artlibrary/patron.html', context)
