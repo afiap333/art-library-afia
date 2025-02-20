@@ -4,7 +4,7 @@ from .models import ArtSupply, Message
 from django.shortcuts import redirect
 from .forms import AddArtSupplyForm
 
-def index():
+def index(request):
     return render(request,'artlibrary/index.html')
 def login_redirect(request):
     #user=request.user
