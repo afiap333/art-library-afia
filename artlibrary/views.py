@@ -1,6 +1,6 @@
 from django.shortcuts import render,resolve_url
 from django.http import HttpResponse
-from .models import ArtSupply, Message, Patron
+from .models import ArtSupply, Message, CustomUser
 from django.shortcuts import redirect
 from .forms import AddArtSupplyForm
 
@@ -12,10 +12,10 @@ def store_user_role(request):
     request.session['user_role']=role
     return redirect('account_login')
 def login_redirect(request):
-   user=request.user
-   if user.user_role=='librarian':
-       return redirect("librarian")
-   return redirect('patron')
+   role=request.session.get("user_role","patron")
+   if role=='librarian':
+       return redirect("librarian_page")
+   return redirect('patron_page')
 
 def librarian_page(request):
     add_item_form = AddArtSupplyForm()
