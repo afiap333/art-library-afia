@@ -161,3 +161,5 @@ SITE_ID = 1 # Change to 1 if needed
 
 LOGIN_REDIRECT_URL = '/artlibrary/redirect-login/'
 #LOGOUT_REDIRECT_URL = '/artlibrary/'
+
+AUTH_USER_MODEL='artlibrary.CustomUser'
