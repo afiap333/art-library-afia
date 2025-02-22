@@ -32,7 +32,7 @@
 
     <!-- Main Content -->
     <div class="container mt-4">
-        <h1 class="text-center">Welcome, Patron!</h1>
+        <h1 class="text-center">Welcome, {{ request.user.get_full_name }}!</h1>
         <p class="text-center">Explore and Borrow Art Supplies</p>
 
         <div class="row">
