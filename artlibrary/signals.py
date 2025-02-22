@@ -8,8 +8,10 @@ User=get_user_model()
 def assign_role(request,sociallogin,**kwargs):
     user=sociallogin.user
     if hasattr(user,'user_role'):
-        user.user_role=assign_role
-        user.save()
+       if user.user_role!='librarian':
+           user.user_role='patron'
+           user.save()
+           
     else:
         user.user_role='patron'
     request.session.pop('user_role',None)

@@ -2,6 +2,7 @@ from django.shortcuts import render,resolve_url
 from django.http import HttpResponse
 from .models import ArtSupply, Message, CustomUser
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm
 
 def index(request):
@@ -11,6 +12,7 @@ def store_user_role(request):
     role=request.GET.get('role')
     request.session['user_role']=role
     return redirect('account_login')
+@login_required
 def login_redirect(request):
    role=request.session.get("user_role","patron")
    if role=='librarian':
