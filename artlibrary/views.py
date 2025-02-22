@@ -14,10 +14,12 @@ def store_user_role(request):
     return redirect('account_login')
 @login_required
 def login_redirect(request):
-   role=request.session.get("user_role","patron")
-   if role=='librarian':
+    role = getattr(request.user, 'user_role', 'patron')
+    user = request.user
+    print(f"User: {user}, Requested Role: {role}, Actual Role: {getattr(user, 'user_role', 'None')}")
+    if role=='librarian':
        return redirect("librarian_page")
-   return redirect('patron_page')
+    return redirect('patron_page')
 
 def librarian_page(request):
     add_item_form = AddArtSupplyForm()
