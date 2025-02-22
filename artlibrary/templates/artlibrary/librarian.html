@@ -1,0 +1,91 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Dashboard</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body class="bg-light">
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Librarian Page</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!--rest of the page-->
+    <div class="container mt-4">
+        <h1 class="text-center">Welcome, {{ request.user.get_full_name }}!</h1>
+        <p class="text-center">Lend and Borrow Art Supplies</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Available Art Supplies</h3>
+                <div class="row">
+                    <!--still getting this to work with the database-->
+                    {% for item in available_items %}
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">Quantity: {{ item.quantity }}</p>
+                                <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                                <a href="{% url 'borrow_item' item.id %}" class="btn btn-primary">Borrow</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No Art Supplies Currently Available</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!--Messages area (for DMs maybe)-->
+            <div class="col-md-4">
+                <h3>Posted Art Supplies</h3>
+                <div class="list-group">
+                    <!--still getting this to work-->
+                    <p>No Art Supplies Currently Posted</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Adding items pop up-->
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemModalLabel">Add New Art Supply!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form add_item_form %}
+                        <button type="submit" class="btn btn-success w-100">Add Item</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

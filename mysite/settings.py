@@ -31,13 +31,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1","localhost","art-library-871f7414fac3.herokuapp.com"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django_extensions',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    
+    "django_bootstrap5",
+    'artlibrary'
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/'templates'], 
+        'DIRS': [BASE_DIR/"artlibrary/templates"], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -157,5 +158,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SITE_ID = 1 # Change to 1 if needed
-LOGIN_REDIRECT_URL = '/artlibrary/'
-LOGOUT_REDIRECT_URL = '/artlibrary/'
+
+LOGIN_REDIRECT_URL = '/artlibrary/redirect-login/'
+#LOGOUT_REDIRECT_URL = '/artlibrary/'
+
+AUTH_USER_MODEL='artlibrary.CustomUser'
