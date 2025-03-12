@@ -28,3 +28,12 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      -uses: actions/checkout@v2
+      -uses: akhileshns/heroku-deploy@v3.14.15 
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: art-library
+        heroku_email: afiap333@gmail.com
