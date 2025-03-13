@@ -9,6 +9,9 @@ def index(request):
     return render(request,'artlibrary/index.html')
 
 def store_user_role(request):
+    if request.GET.get("anonymous"):  
+        request.session['user_role'] = 'anonymous'
+        return redirect('anonymous_page')
     role=request.GET.get('role')
     request.session['user_role']=role
     return redirect('account_login')
@@ -33,6 +36,14 @@ def librarian_page(request):
     }
     
     return render(request, 'artlibrary/librarian.html', context)
+
+def anonymous_page(request):
+    user=request.user
+    available_items = ArtSupply.objects.all()
+    context = {
+        'available_items': available_items,
+    }
+    return render(request, 'artlibrary/anonymous.html', context)
 
 
 def patron_page(request):

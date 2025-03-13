@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    roles=(('patron','Patron'),('librarian','Librarian'),)
+    roles=(('patron','Patron'),('librarian','Librarian'),('anonymous','Anonymous'))
     user_role=models.CharField(max_length=12,choices=roles, default='patron')
     def librarian_check(self):
         return self.user_role=='librarian'
