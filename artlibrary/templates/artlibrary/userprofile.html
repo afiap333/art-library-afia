@@ -33,7 +33,7 @@
     <!--rest of the page-->
     <div class="container mt-4">
         <!--Add profile pic-->
-        <h4 class="text-center">Name: {{ request.user.get_full_name }}!</h1>
+        <h4 class="text-center">Name: {{ request.user.get_full_name }}</h1>
         <p class="text-center">Email: {{request.user.email}}</p>
         <p class="text-center">Date Joined: {{request.user.date_joined}}</p>
     </div>
