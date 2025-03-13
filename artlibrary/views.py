@@ -56,3 +56,5 @@ def patron_page(request):
     }
 
     return render(request, 'artlibrary/patron.html', context)
+def profile(request):
+    return render(request,'artlibrary/userprofile.html')

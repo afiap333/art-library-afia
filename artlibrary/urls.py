@@ -9,4 +9,5 @@ urlpatterns = [
     path('patron/', views.patron_page, name='patron_page'),
     path('anonymous/', views.anonymous_page, name='anonymous_page'),
     path('store-user-role/', views.store_user_role, name='store_user_role'),
+    path('profile/', views.profile, name='profile'),
 ]
