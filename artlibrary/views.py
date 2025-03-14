@@ -18,7 +18,7 @@ def store_user_role(request):
     role=request.GET.get('role')
     request.session['user_role']=role
     return redirect('account_login')
-@login_required
+@login_required(login_url='/accounts/login/')
 def login_redirect(request):
     role = getattr(request.user, 'user_role', 'patron')
     user = request.user
@@ -26,7 +26,7 @@ def login_redirect(request):
     if role=='librarian':
        return redirect("librarian_page")
     return redirect('patron_page')
-
+@login_required(login_url='/accounts/login/')
 def librarian_page(request):
     if request.method == "POST":
         add_item_form = AddArtSupplyForm(request.POST, request.FILES) 
@@ -47,14 +47,18 @@ def librarian_page(request):
     return render(request, 'artlibrary/librarian.html', context)
 
 def anonymous_page(request):
-    user=request.user
+    if request.user.is_authenticated:
+        user=request.user
+    else:
+        user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
     available_items = ArtSupply.objects.all()
     context = {
+        'user':user,
         'available_items': available_items,
     }
     return render(request, 'artlibrary/anonymous.html', context)
 
-
+@login_required
 def patron_page(request):
     available_items = ArtSupply.objects.all()
     messages = Message.objects.filter(recipient=request.user)

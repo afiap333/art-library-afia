@@ -21,6 +21,9 @@ class AnonymousUserRedirect(TestCase):
     def test_anonymous_access(self):
         response = self.client.get(reverse("anonymous_page"))
         self.assertEqual(response.status_code, 200) 
+    def test_anonymous_librarian(self):
+        response = self.client.get(reverse("librarian_page"))
+        self.assertRedirects(response, "/accounts/login/?next=" + reverse("librarian_page"))
 class PatronRedirect(TestCase):
     def setUp(self):
         self.client=Client()
