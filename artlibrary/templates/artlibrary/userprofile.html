@@ -8,6 +8,23 @@
     <title>User Profile</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -33,7 +50,7 @@
     <!--rest of the page-->
     <div class="container mt-4">
         <!--Add profile pic-->
-        <h1 class="text-center">Name: {{ request.user.get_full_name }}</h1>
+        <h1 class="text-center">Name: {{ request.user.get_full_name|default:request.user.username }}!</h1>
         <p class="text-center">Email: {{request.user.email}}</p>
         <p class="text-center">Date Joined: {{request.user.date_joined}}</p>
     </div>

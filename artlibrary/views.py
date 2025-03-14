@@ -4,6 +4,9 @@ from .models import ArtSupply, Message, CustomUser
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm
+from django.contrib.auth import logout
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 def index(request):
     return render(request,'artlibrary/index.html')
@@ -64,3 +67,14 @@ def patron_page(request):
     return render(request, 'artlibrary/patron.html', context)
 def profile(request):
     return render(request,'artlibrary/userprofile.html')
+
+def logout_view(request):
+    if request.user.is_authenticated:
+        request.session.flush()
+
+        social_account = SocialAccount.objects.filter(user=request.user, provider='google').first()
+        if social_account:
+            social_account.socialtoken_set.all().delete()
+
+    logout(request)
+    return redirect('index')

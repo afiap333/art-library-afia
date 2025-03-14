@@ -150,6 +150,9 @@ SOCIALACCOUNT_PROVIDERS = {
             'profile',
             'email',
         ],
+        'AUTH_PARAMS': {
+            'prompt': 'select_account'
+        },
         'APP': {
             'client_id': os.getenv('CLIENT_ID'),
             'secret': os.getenv('CLIENT_SECRET'),

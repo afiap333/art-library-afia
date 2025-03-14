@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     date_joined=models.DateTimeField(auto_now_add=True)
     roles=(('patron','Patron'),('librarian','Librarian'),('anonymous','Anonymous'))
     user_role=models.CharField(max_length=12,choices=roles, default='patron')
+    email = models.EmailField(blank=True, max_length=254, verbose_name='email address')
     def librarian_check(self):
         return self.user_role=='librarian'
     def is_patron(self):

@@ -8,6 +8,23 @@
     <title>Patron Dashboard</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -25,7 +42,9 @@
                     <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="#">Logout</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -33,16 +52,14 @@
 
     <!-- Main Content -->
     <div class="container mt-4">
-        <h1 class="text-center">Welcome, {{ request.user.get_full_name }}!</h1>
+        <h1 class="text-center">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
         <p class="text-center">Explore and Borrow Art Supplies</p>
 
         <!-- Search Feature -->
-        <form method="GET" action="{% url 'search_items' %}" class="mb-4">
             <div class="input-group">
                 <input type="text" name="query" class="form-control" placeholder="Search by title or collection...">
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
-        </form>
 
         <div class="row">
             <!-- Available Art Supplies -->
@@ -57,7 +74,6 @@
                                 <h5 class="card-title">{{ item.name }}</h5>
                                 <p class="card-text">Quantity: {{ item.quantity }}</p>
                                 <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
-                                <a href="{% url 'borrow_item' item.id %}" class="btn btn-primary">Borrow</a>
                             </div>
                         </div>
                     </div>
