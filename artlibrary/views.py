@@ -25,16 +25,22 @@ def login_redirect(request):
     return redirect('patron_page')
 
 def librarian_page(request):
-    add_item_form = AddArtSupplyForm()
+    if request.method == "POST":
+        add_item_form = AddArtSupplyForm(request.POST, request.FILES) 
+        if add_item_form.is_valid():
+            artSupply=add_item_form.save(commit=False)
+            artSupply.added_by=request.user
+            artSupply.save() 
+            return redirect('librarian_page')
+    else:
+        add_item_form = AddArtSupplyForm()
     available_items = ArtSupply.objects.all()
     messages = Message.objects.filter(recipient=request.user)
-
     context = {
         'add_item_form': add_item_form,
         'available_items': available_items,
         'messages': messages,
     }
-    
     return render(request, 'artlibrary/librarian.html', context)
 
 def anonymous_page(request):
