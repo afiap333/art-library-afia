@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
+from django.db import models
 
 def index(request):
     return render(request,'artlibrary/index.html')
@@ -69,12 +70,61 @@ def profile(request):
     return render(request,'artlibrary/userprofile.html')
 
 def logout_view(request):
-    if request.user.is_authenticated:
-        request.session.flush()
-
-        social_account = SocialAccount.objects.filter(user=request.user, provider='google').first()
-        if social_account:
-            social_account.socialtoken_set.all().delete()
-
     logout(request)
+    request.session.flush()
     return redirect('index')
+
+class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
+    def get_auth_params(self, request, action):
+        params = super().get_auth_params(request, action)
+        if request.COOKIES.get('force_google_reauth') == 'true':
+            params['prompt'] = 'select_account'
+            response = request.response
+            if response:
+                response.delete_cookie('force_google_reauth')
+        
+        return params
+    
+def librarian_page(request):
+    query = request.GET.get('query', '')
+    
+    if request.method == "POST":
+        add_item_form = AddArtSupplyForm(request.POST, request.FILES) 
+        if add_item_form.is_valid():
+            artSupply = add_item_form.save(commit=False)
+            artSupply.added_by = request.user
+            artSupply.save() 
+            return redirect('librarian_page')
+    else:
+        add_item_form = AddArtSupplyForm()
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    else:
+        available_items = ArtSupply.objects.all()
+    
+    messages = Message.objects.filter(recipient=request.user)
+    context = {
+        'add_item_form': add_item_form,
+        'available_items': available_items,
+        'messages': messages,
+        'query': query,
+    }
+    return render(request, 'artlibrary/librarian.html', context)
+
+def patron_page(request):
+    query = request.GET.get('query', '')
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    else:
+        available_items = ArtSupply.objects.all()
+    
+    messages = Message.objects.filter(recipient=request.user)
+
+    context = {
+        'available_items': available_items,
+        'messages': messages,
+        'query': query,
+    }
+    return render(request, 'artlibrary/patron.html', context)

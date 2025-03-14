@@ -151,7 +151,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'email',
         ],
         'AUTH_PARAMS': {
-            'prompt': 'select_account'
+            'access_type': 'online'
         },
         'APP': {
             'client_id': os.getenv('CLIENT_ID'),

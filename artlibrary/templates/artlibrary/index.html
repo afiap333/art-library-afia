@@ -3,6 +3,7 @@
 <head>
     {% load static %}
     {% load django_bootstrap5 %}
+    {% load socialaccount %}
     <style>
         html, body {
             height: 100%;
@@ -30,7 +31,7 @@
     <p class="display-1 p-4 text-center">Art Library</p>
     <div class="container p-4 text-center">
         <ul>
-            <button type="button" class="btn btn-info"> <a href="{% url 'store_user_role' %}" class="text-white text-decoration-none">Login with Google</a></button>
+            <button type="button" class="btn btn-info"> <a href="{% provider_login_url 'google' process='login' prompt='select_account' %}" class="text-white text-decoration-none">Login with Google</a></button>
         </ul>
         <ul>
             <button type="button" class="btn btn-info">  <a href="{% url 'store_user_role' %}?anonymous=true" class="text-white text-decoration-none">Login as anonymous user</a></button>
