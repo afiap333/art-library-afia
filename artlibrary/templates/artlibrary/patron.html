@@ -36,6 +36,14 @@
         <h1 class="text-center">Welcome, {{ request.user.get_full_name }}!</h1>
         <p class="text-center">Explore and Borrow Art Supplies</p>
 
+        <!-- Search Feature -->
+        <form method="GET" action="{% url 'search_items' %}" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Search by title or collection...">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
         <div class="row">
             <!-- Available Art Supplies -->
             <div class="col-md-8">
