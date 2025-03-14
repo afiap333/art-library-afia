@@ -1,9 +1,9 @@
 from django.shortcuts import render,resolve_url
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser
+from .models import ArtSupply, Message, CustomUser,Collection
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm
+from .forms import AddArtSupplyForm,AddCollectionForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -28,22 +28,32 @@ def login_redirect(request):
     return redirect('patron_page')
 @login_required(login_url='/accounts/login/')
 def librarian_page(request):
+    add_item_form = AddArtSupplyForm()
+    add_collection_form = AddCollectionForm()
     if request.method == "POST":
-        add_item_form = AddArtSupplyForm(request.POST, request.FILES) 
-        if add_item_form.is_valid():
-            artSupply=add_item_form.save(commit=False)
-            artSupply.added_by=request.user
-            artSupply.save() 
-            return redirect('librarian_page')
-    else:
-        add_item_form = AddArtSupplyForm()
+        if "add_item" in request.POST: 
+            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+            if add_item_form.is_valid():
+                artSupply = add_item_form.save(commit=False)
+                artSupply.added_by = request.user
+                artSupply.save()
+                return redirect('librarian_page')
+        if "add_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES)
+            if add_collection_form.is_valid():
+                collection = add_collection_form.save(commit=False)
+                collection.added_by = request.user
+                collection.save()
+                return redirect('librarian_page')
     available_items = ArtSupply.objects.all()
     messages = Message.objects.filter(recipient=request.user)
     context = {
         'add_item_form': add_item_form,
+        'add_collection_form':add_collection_form,
         'available_items': available_items,
         'messages': messages,
     }
+    collections = Collection.objects.all()
     return render(request, 'artlibrary/librarian.html', context)
 
 def anonymous_page(request):

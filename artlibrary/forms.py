@@ -20,10 +20,9 @@ class AddArtSupplyForm(forms.ModelForm):
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
-        fields = ['title','description','is_public']
+        fields = ['title', 'description', 'is_public']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), 
             'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-

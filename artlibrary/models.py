@@ -26,6 +26,8 @@ class Collection(models.Model):
     num_items=models.PositiveIntegerField(default=0)
     is_public=models.BooleanField(default=True)
     users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
+    def __str__(self):
+        return self.title
 
     
 class ArtSupply(models.Model):
