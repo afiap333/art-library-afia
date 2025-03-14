@@ -9,50 +9,84 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
+        }
+        
+        body {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
         
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container {
+        .main-content {
             flex: 1;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
         }
     </style>
 </head>
 <body class="bg-light">
 
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">User Profile</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="#">Logout</a></li>
-                </ul>
-            </div>
+   <!-- Navigation Bar -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Patron Page</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'patron_page' %}">Borrow</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!--rest of the page-->
-    <div class="container mt-4">
-        <!--Add profile pic-->
-        <h1 class="text-center">Name: {{ request.user.get_full_name|default:request.user.username }}!</h1>
-        <p class="text-center">Email: {{request.user.email}}</p>
-        <p class="text-center">Date Joined: {{request.user.date_joined}}</p>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body text-center py-4">
+            <h1 class="display-5 fw-bold text-brown">Name: {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        </div>
+        <p class="card-body text-center py-4 card-title text-brown fw-bold mb-0">Email: {{request.user.email}}</p>
+        <p class="card-body text-center py-4 card-title text-brown fw-bold mb-0">Date Joined: {{request.user.date_joined}}</p>
     </div>
 
     <!--Adding items pop up-->
@@ -60,9 +94,18 @@
 </body>
 
 <!-- Footer -->
-<footer class="bg-dark text-light text-center py-3 mt-4">
+<footer class="py-3 bg-dark text-white mt-auto bg-brown">
     <div class="container">
-        <p class="mb-0">&copy; 2025 Art Supplies Exchange. All rights reserved.</p>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+            </div>
+        </div>
     </div>
 </footer>
 
