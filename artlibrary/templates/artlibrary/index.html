@@ -5,47 +5,166 @@
     {% load django_bootstrap5 %}
     {% load socialaccount %}
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
         }
         
         body {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-color: #f8f5f2;
         }
-
-        .container {
+        
+        .main-content {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-brown:hover {
+            background-color: #A67C52;
+            border-color: #A67C52;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .login-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(93, 64, 55, 0.15);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-title {
+            color: #5D4037;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .login-subtitle {
+            color: #A67C52;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .login-divider-line {
+            flex: 1;
+            height: 1px;
+            background-color: #e0e0e0;
+        }
+        
+        .login-divider-text {
+            padding: 0 15px;
+            color: #777;
+        }
+        
+        .login-logo {
+            margin-bottom: 25px;
         }
     </style>
-    <title>{% block title %}Homepage{% endblock %}</title>
+    <title>Login - Art Library</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 </head>
 <body>
-    <p class="display-1 p-4 text-center">Art Library</p>
-    <div class="container p-4 text-center">
-        <ul>
-            <button type="button" class="btn btn-info"> <a href="{% provider_login_url 'google' process='login' prompt='select_account' %}" class="text-white text-decoration-none">Login with Google</a></button>
-        </ul>
-        <ul>
-            <button type="button" class="btn btn-info">  <a href="{% url 'store_user_role' %}?anonymous=true" class="text-white text-decoration-none">Login as anonymous user</a></button>
-        </ul>
+    <div class="main-content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <div class="login-card mx-auto">
+                        <div class="login-logo">
+                            <h1 class="text-brown">Log In</h1>
+                            <p class="login-subtitle">Borrow and lend art supplies!</p>
+                        </div>
+                        
+                        <a href="{% provider_login_url 'google' process='login' prompt='select_account' %}" class="btn btn-brown login-button d-flex align-items-center justify-content-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-google me-2" viewBox="0 0 16 16">
+                                <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
+                            </svg>
+                            Login with Google
+                        </a>
+                        
+                        <div class="login-divider">
+                            <div class="login-divider-line"></div>
+                            <div class="login-divider-text">OR</div>
+                            <div class="login-divider-line"></div>
+                        </div>
+                        
+                        <a href="{% url 'store_user_role' %}?anonymous=true" class="btn btn-outline-brown login-button">Continue as Anonymous User</a>
+                        <p class="mt-4 mb-0 text-muted small">By logging in, you agree to our Terms of Service</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="py-3 bg-brown text-white mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                    <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="{% static 'js/bootstrap.js' %}"></script>
 </body>
-
-
-<!-- Footer -->
-<footer class="bg-dark text-light text-center py-3 mt-4">
-    <div class="container">
-        <p class="mb-0">&copy; 2025 Art Supplies Exchange. All rights reserved.</p>
-    </div>
-</footer>
-
 </html>
