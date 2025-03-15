@@ -39,17 +39,23 @@ class Collection(models.Model):
 
     
 class ArtSupply(models.Model):
-    STATUS=[
-        ('available','Available'), ('checked_out','Checked Out'),
+    STATUS = [
+        ('available', 'Available'), 
+        ('checked_out', 'Checked Out'),
     ]
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='art_supplies/')
+    image = models.ImageField(
+        storage=S3Boto3Storage(),  # Ensures upload to S3
+        upload_to='art_supplies/',  # S3 bucket folder
+        null=True,
+        blank=True
+    )
     quantity = models.PositiveIntegerField()
-    status=models.CharField(max_length=20,choices=STATUS,default='available')
+    status = models.CharField(max_length=20, choices=STATUS, default='available')
     pickup_location = models.CharField(max_length=255)
-    description=models.TextField(null=True, blank=True)
-    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='added_items')
-    collection=models.ForeignKey(Collection,on_delete=models.CASCADE,related_name='items',null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='items', null=True, blank=True)
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
