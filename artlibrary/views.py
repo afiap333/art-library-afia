@@ -52,8 +52,10 @@ def update_profile(request):
 
     return render(request, "artlibrary/userprofile.html", {"form": form, "user": user})
 
-
+@login_required
 def librarian_page(request):
+    if request.user.role=='anonymous':
+        return redirect('artlibrary')
     add_item_form = AddArtSupplyForm()
     add_collection_form = AddCollectionForm()
     if request.method == "POST":
@@ -72,7 +74,10 @@ def librarian_page(request):
                 collection.save()
                 return redirect('librarian_page')
     available_items = ArtSupply.objects.all()
-    messages = Message.objects.filter(recipient=request.user)
+    if request.user.role!="anonymous":
+        messages = Message.objects.filter(recipient=request.user)
+    else: 
+        messages=[]
     context = {
         'add_item_form': add_item_form,
         'add_collection_form':add_collection_form,
