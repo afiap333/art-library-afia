@@ -29,10 +29,16 @@
         </div>
     </nav>
 
-    <!--rest of the page-->
+    <!-- Main Content -->
     <div class="container mt-4">
-        <h1 class="text-center">Welcome!</h1>
+        <h1 class="text-center">Welcome, Anonymous User!</h1>
         <p class="text-center">Lend and Borrow Art Supplies</p>
+
+       <!-- Search Feature -->
+       <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Search by title or collection...">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
 
         <div class="row">
             <div class="col-md-8">
@@ -47,7 +53,7 @@
                                 <h5 class="card-title">{{ item.name }}</h5>
                                 <p class="card-text">Quantity: {{ item.quantity }}</p>
                                 <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
-                                <a href="{% url 'borrow_item' item.id %}" class="btn btn-primary">Borrow</a>
+                                <!--<a href="{% url 'borrow_item' item.id %}" class="btn btn-primary">Borrow</a>-->
                             </div>
                         </div>
                     </div>
@@ -69,5 +75,14 @@
     </div>
 
     <!--Adding items pop up-->
+
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light text-center py-3 mt-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Art Supplies Exchange. All rights reserved.</p>
+        </div>
+    </footer>
+
 </body>
 </html>

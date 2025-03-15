@@ -1,0 +1,73 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patron Dashboard</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        .card {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container mt-4">
+        <h1 class="text-center">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        <p class="text-center">Explore and Borrow Art Supplies</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Available Art Supplies</h3>
+                <div class="row">
+                    {% for item in available_items %}
+                    <div class="col-md-4">
+                        <!-- Art Supply Card -->
+                        <div class="card mb-3" data-bs-toggle="modal" data-bs-target="#itemModal{{ item.id }}">
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">Quantity: {{ item.quantity }}</p>
+                                <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Each Item -->
+                    <div class="modal fade" id="itemModal{{ item.id }}" tabindex="-1" aria-labelledby="itemModalLabel{{ item.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="itemModalLabel{{ item.id }}">{{ item.name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <img src="{{ item.image.url }}" class="img-fluid mb-3" alt="{{ item.name }}">
+                                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                    <p><strong>Pickup Location:</strong> {{ item.pickup_location }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="POST" action="{% url 'borrow_item' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <button type="submit" class="btn btn-primary">Request to Borrow</button>
+                                    </form>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No Art Supplies Currently Available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

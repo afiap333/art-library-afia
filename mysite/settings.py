@@ -162,6 +162,9 @@ SOCIALACCOUNT_PROVIDERS = {
             'profile',
             'email',
         ],
+        'AUTH_PARAMS': {
+            'access_type': 'online'
+        },
         'APP': {
             'client_id': env('CLIENT_ID'),
             'secret': env('CLIENT_SECRET'),

@@ -8,56 +8,124 @@
     <title>User Profile</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <style>
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-    <!-- ✅ Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">User Profile</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="#">Logout</a></li>
-                </ul>
-            </div>
+   <!-- Navigation Bar -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Profile Page</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'redirect-login' %}">Borrow</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- ✅ User Profile Section -->
-    <div class="container mt-5">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h2 class="mb-3">{{ request.user.get_full_name }}</h2>
-                <p>Email: {{ request.user.email }}</p>
-                <p>Date Joined: {{ request.user.date_joined }}</p>
+   <!-- ✅ User Profile Section -->
+   <div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="mb-3">{{ request.user.get_full_name }}</h2>
+            <p>Email: {{ request.user.email }}</p>
+            <p>Date Joined: {{ request.user.date_joined }}</p>
 
-                <!-- ✅ Display Profile Picture -->
-                {% if request.user.profile_pic %}
-                    <img src="{{ request.user.profile_pic.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                {% else %}
-                    <p class="text-muted">No profile picture uploaded.</p>
-                {% endif %}
+            <!-- ✅ Display Profile Picture -->
+            {% if request.user.profile_pic %}
+                <img src="{{ request.user.profile_pic.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+                <p class="text-muted">No profile picture uploaded.</p>
+            {% endif %}
 
-                <!-- ✅ Profile Picture Upload Form -->
-                <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile' %}" class="mt-3">
-                    {% csrf_token %}
-                    {{ form.as_p }}
+            <!-- ✅ Profile Picture Upload Form -->
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile' %}" class="mt-3">
+                {% csrf_token %}
+                {{ form.as_p }}
 
-                    <div class="mb-3">
-                        <input type="file" name="profile_pic" class="form-control">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
-                </form>
+                <div class="mb-3">
+                    <input type="file" name="profile_pic" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<!-- Footer -->
+<footer class="py-3 bg-dark text-white mt-auto bg-brown">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
             </div>
         </div>
     </div>
+</footer>
 
-</body>
+
 </html>

@@ -2,6 +2,7 @@ from django.urls import path, include
 from . import views
 from .views import update_profile
 
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("librarian_dashboard/", views.librarian_page, name='librarian_page'),
@@ -14,4 +15,5 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('profile/update/', update_profile, name='update_profile'),
     path('profile/update/', views.update_profile, name='update_profile')
+    path('', views.logout_view, name='logout'),
 ]

@@ -7,15 +7,15 @@ from storages.backends.s3boto3 import S3Boto3Storage
 
 class CustomUser(AbstractUser):
     profile_pic = models.ImageField(
-        storage=S3Boto3Storage(),  # ✅ Ensures files go to S3
-        upload_to='profile_pics/',  # ✅ Ensures no double `profile_pics/profile_pics`
+        storage=S3Boto3Storage(),  
+        upload_to='profile_pics/',  
         null=True,
         blank=True
     )
     date_joined = models.DateTimeField(auto_now_add=True)
     roles = (('patron', 'Patron'), ('librarian', 'Librarian'), ('anonymous', 'Anonymous'))
     user_role = models.CharField(max_length=12, choices=roles, default='patron')
-
+    email = models.EmailField(blank=True, max_length=254, verbose_name='email address')
     def librarian_check(self):
         return self.user_role == 'librarian'
     
@@ -34,6 +34,8 @@ class Collection(models.Model):
     num_items=models.PositiveIntegerField(default=0)
     is_public=models.BooleanField(default=True)
     users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
+    def __str__(self):
+        return self.title
 
     
 class ArtSupply(models.Model):
