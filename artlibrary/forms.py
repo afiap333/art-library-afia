@@ -30,7 +30,7 @@ class AddCollectionForm(forms.ModelForm):
         }
 
 class ProfileForm(forms.ModelForm):
-    profile_pic = forms.ImageField(required=False)  # ✅ Ensures only valid images
+    profile_pic = forms.ImageField(required=False)
     user_role = forms.ChoiceField(choices=CustomUser.roles, required=True)
     class Meta:
         model = CustomUser

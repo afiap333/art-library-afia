@@ -14,6 +14,6 @@ urlpatterns = [
     path('store-user-role/', views.store_user_role, name='store_user_role'),
     path('profile/', views.profile, name='profile'),
     path('profile/update/', update_profile, name='update_profile'),
-    path('profile/update/', views.update_profile, name='update_profile')
+    path('profile/update/', views.update_profile, name='update_profile'),
     path('', views.logout_view, name='logout'),
 ]
