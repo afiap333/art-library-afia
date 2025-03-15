@@ -171,6 +171,8 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
+#no longer goes to the intermediate page between index and google email options
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SITE_ID = 1 # Change to 1 if needed
 
