@@ -1,5 +1,7 @@
 from django import forms
 from .models import ArtSupply
+from .models import CustomUser
+
 
 class AddArtSupplyForm(forms.ModelForm):
     class Meta:
@@ -11,3 +13,10 @@ class AddArtSupplyForm(forms.ModelForm):
             'pickup_location': forms.TextInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+class ProfileForm(forms.ModelForm):
+    profile_pic = forms.ImageField(required=False)  # ✅ Ensures only valid images
+    user_role = forms.ChoiceField(choices=CustomUser.roles, required=True)
+    class Meta:
+        model = CustomUser
+        fields = ['profile_pic','user_role']

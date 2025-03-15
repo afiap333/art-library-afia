@@ -1,17 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from storages.backends.s3boto3 import S3Boto3Storage
+
 
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    #profile_pic=models.ImageField(upload_to=)
-    date_joined=models.DateTimeField(auto_now_add=True)
-    roles=(('patron','Patron'),('librarian','Librarian'),('anonymous','Anonymous'))
-    user_role=models.CharField(max_length=12,choices=roles, default='patron')
+    profile_pic = models.ImageField(
+        storage=S3Boto3Storage(),  # ✅ Ensures files go to S3
+        upload_to='profile_pics/',  # ✅ Ensures no double `profile_pics/profile_pics`
+        null=True,
+        blank=True
+    )
+    date_joined = models.DateTimeField(auto_now_add=True)
+    roles = (('patron', 'Patron'), ('librarian', 'Librarian'), ('anonymous', 'Anonymous'))
+    user_role = models.CharField(max_length=12, choices=roles, default='patron')
+
     def librarian_check(self):
-        return self.user_role=='librarian'
+        return self.user_role == 'librarian'
+    
     def is_patron(self):
-        return self.user_role=='patron'
+        return self.user_role == 'patron'
 class Message(models.Model):
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_messages")
     recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="received_messages")

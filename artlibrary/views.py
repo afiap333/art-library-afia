@@ -4,6 +4,8 @@ from .models import ArtSupply, Message, CustomUser
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm
+from .forms import ProfileForm
+
 
 def index(request):
     return render(request,'artlibrary/index.html')
@@ -23,6 +25,29 @@ def login_redirect(request):
     if role=='librarian':
        return redirect("librarian_page")
     return redirect('patron_page')
+
+@login_required
+def update_profile(request):
+    user = request.user  # Get logged-in user
+    
+    if request.method == "POST":
+        print("POST request received")  # Debugging step
+        print("FILES: ", request.FILES)  # See if the file is actually being sent
+
+        form = ProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            print("Form is valid. Saving profile picture...")
+            form.save()
+            print("Profile picture saved!")
+            return redirect("profile")  # Redirect to profile page
+        else:
+            print("Form is NOT valid:", form.errors)  # Debugging output
+
+    else:
+        form = ProfileForm(instance=user)
+
+    return render(request, "artlibrary/userprofile.html", {"form": form, "user": user})
+
 
 def librarian_page(request):
     add_item_form = AddArtSupplyForm()
