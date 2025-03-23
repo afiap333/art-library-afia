@@ -34,6 +34,7 @@ class Collection(models.Model):
     num_items=models.PositiveIntegerField(default=0)
     is_public=models.BooleanField(default=True)
     users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
     def __str__(self):
         return self.title
 
