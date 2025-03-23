@@ -175,6 +175,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -185,6 +186,7 @@
                 <div class="modal-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
+                        {% bootstrap_form add_collection_form %}
                         <button type="submit" name="add_collection" class="btn btn-success w-100">Add Collection</button> 
                     </form>
                 </div>

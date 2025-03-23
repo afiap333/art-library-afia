@@ -54,27 +54,26 @@ def update_profile(request):
 
 @login_required
 def librarian_page(request):
-    if request.user.role=='anonymous':
+    if request.user.user_role=='anonymous':
         return redirect('artlibrary')
     add_item_form = AddArtSupplyForm()
-    add_collection_form = AddCollectionForm()
-    if request.method == "POST":
-        if "add_item" in request.POST: 
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                return redirect('librarian_page')
-        if "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('librarian_page')
+    add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user) 
+    if "add_item" in request.POST: 
+        add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+        if add_item_form.is_valid():
+            artSupply = add_item_form.save(commit=False)
+            artSupply.added_by = request.user
+            artSupply.save()
+            return redirect('librarian_page')
+    if "add_collection" in request.POST:
+        add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+        if add_collection_form.is_valid():
+            collection = add_collection_form.save(commit=False)
+            collection.added_by = request.user
+            collection.save()
+            return redirect('librarian_page')
     available_items = ArtSupply.objects.all()
-    if request.user.role!="anonymous":
+    if request.user.user_role!="anonymous":
         messages = Message.objects.filter(recipient=request.user)
     else: 
         messages=[]
@@ -103,12 +102,20 @@ def anonymous_page(request):
 def patron_page(request):
     available_items = ArtSupply.objects.all()
     messages = Message.objects.filter(recipient=request.user)
-
+    add_collection_form = AddCollectionForm(user=request.user)
+    if request.method == "POST":
+        if "add_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+            if add_collection_form.is_valid():
+                collection = add_collection_form.save(commit=False)
+                collection.added_by = request.user
+                collection.save()
+                return redirect('patron_page')
     context = {
+        'add_collection_form': add_collection_form,
         'available_items': available_items,
         'messages': messages,
     }
-
     return render(request, 'artlibrary/patron.html', context)
 def profile(request):
     return render(request,'artlibrary/userprofile.html')
@@ -128,47 +135,3 @@ class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
                 response.delete_cookie('force_google_reauth')
         
         return params
-    
-def librarian_page(request):
-    query = request.GET.get('query', '')
-    
-    if request.method == "POST":
-        add_item_form = AddArtSupplyForm(request.POST, request.FILES) 
-        if add_item_form.is_valid():
-            artSupply = add_item_form.save(commit=False)
-            artSupply.added_by = request.user
-            artSupply.save() 
-            return redirect('librarian_page')
-    else:
-        add_item_form = AddArtSupplyForm()
-
-    if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
-    else:
-        available_items = ArtSupply.objects.all()
-    
-    messages = Message.objects.filter(recipient=request.user)
-    context = {
-        'add_item_form': add_item_form,
-        'available_items': available_items,
-        'messages': messages,
-        'query': query,
-    }
-    return render(request, 'artlibrary/librarian.html', context)
-
-def patron_page(request):
-    query = request.GET.get('query', '')
-
-    if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
-    else:
-        available_items = ArtSupply.objects.all()
-    
-    messages = Message.objects.filter(recipient=request.user)
-
-    context = {
-        'available_items': available_items,
-        'messages': messages,
-        'query': query,
-    }
-    return render(request, 'artlibrary/patron.html', context)

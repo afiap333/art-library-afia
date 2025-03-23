@@ -70,6 +70,7 @@
                     <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
                     <li class="nav-item">
@@ -100,6 +101,23 @@
                     {% endif %}
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCollectionModalLabel">Add New Collection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form add_collection_form %}
+                        <button type="submit" name="add_collection" class="btn btn-success w-100">Add Collection</button> 
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
