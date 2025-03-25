@@ -44,6 +44,10 @@ class ArtSupply(models.Model):
         ('available', 'Available'), 
         ('checked_out', 'Checked Out'),
     ]
+    USE_TYPE=[
+        ('single','Single Use'),
+        ('multi','Multi Use'),
+    ]
     name = models.CharField(max_length=255)
     image = models.ImageField(
         storage=S3Boto3Storage(),  # Ensures upload to S3
@@ -54,12 +58,22 @@ class ArtSupply(models.Model):
     quantity = models.PositiveIntegerField()
     status = models.CharField(max_length=20, choices=STATUS, default='available')
     pickup_location = models.CharField(max_length=255)
+    use_policy=models.TextField(null=True,blank=True)
+    item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='items', null=True, blank=True)
+    def __str__(self):
+        return self.name
+
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     rating=models.PositiveIntegerField()
     comment=models.TextField(null=True, blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
+class Keyword(models.Model):
+    collection = models.ForeignKey(ArtSupply, on_delete=models.CASCADE, related_name='keywords')
+    word=models.CharField(null=True,blank=True, max_length=100)
+    def __str__(self):
+        return self.word
