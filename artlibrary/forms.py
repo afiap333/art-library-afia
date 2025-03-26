@@ -52,6 +52,16 @@ class AddCollectionForm(forms.ModelForm):
         super().__init__(*args,**kwargs)
         if user and user.user_role!='librarian':
              self.fields.pop('is_public',None)
+class EditCollectionForm(forms.ModelForm):
+    class Meta:
+        model = Collection
+        fields = ['title', 'description', 'is_public']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), 
+            'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    delete_collection = forms.BooleanField(required=False, label="Delete Collection")
  
 class ProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False)

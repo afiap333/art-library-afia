@@ -1,9 +1,9 @@
-from django.shortcuts import render,resolve_url
+from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
 from .models import ArtSupply, Message, CustomUser,Collection
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm,AddCollectionForm
+from .forms import AddArtSupplyForm,AddCollectionForm,EditCollectionForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
@@ -135,3 +135,58 @@ class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
                 response.delete_cookie('force_google_reauth')
         
         return params
+def collections(request):
+    user_role = getattr(request.user, 'user_role', None)
+    if user_role == "librarian":
+        viewable_collections = Collection.objects.all()
+    else:
+        viewable_collections = Collection.objects.filter(is_public=True)
+    add_item_form = AddArtSupplyForm()
+    add_collection_form = AddCollectionForm(user=request.user)
+    edit_collection_form=EditCollectionForm()
+    for collection in viewable_collections:
+    if request.method == "POST":
+        if "add_item" in request.POST:
+            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+            if add_item_form.is_valid():
+                art_supply = add_item_form.save(commit=False)
+                art_supply.added_by = request.user
+                art_supply.save()
+                return redirect('librarian_page')
+        elif "add_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
+            if add_collection_form.is_valid():
+                collection = add_collection_form.save(commit=False)
+                collection.added_by = request.user
+                collection.save()
+                if (user_role == "librarian"):
+                    return redirect('librarian_page')
+                else:
+                    return redirect('patron_dashboard')
+        if 'edit_collection' in request.GET:
+            collection_id = request.GET['edit_collection']
+            collection = get_object_or_404(Collection, id=collection_id)
+            if collection.added_by != request.user and user_role != "librarian":
+                return redirect('permission_denied')
+            edit_collection_form = EditCollectionForm(instance=collection)
+            if request.method == 'POST':
+                edit_collection_form = EditCollectionForm(request.POST, instance=collection)
+                if 'delete_collection' in request.POST and request.POST.get('delete_collection') == 'on':
+                    collection.delete()
+                    if (user_role == "librarian"):
+                        return redirect('librarian_page')
+                    else:
+                        return redirect('patron_dashboard')
+                if edit_collection_form.is_valid():
+                    edit_collection_form.save()
+                    if (user_role == "librarian"):
+                        return redirect('librarian_page')
+                    else:
+                        return redirect('patron_dashboard')
+    context = {
+        'add_collection_form': add_collection_form,
+        'viewable_collections': viewable_collections,
+        'add_item_form': add_item_form,
+        'edit_collection_form':edit_collection_form,
+    }
+    return render(request, 'artlibrary/collections.html', context)
