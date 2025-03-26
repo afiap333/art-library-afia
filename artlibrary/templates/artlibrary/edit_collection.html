@@ -91,7 +91,10 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ edit_collection_form.as_p }}
-            <button type="submit" name="add_collection" class="btn btn-success">Edit Collection</button>
+            <button type="submit" name="edit_collection" class="btn btn-success">Edit Collection</button>
+            {% if collection.id %}
+            <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
+            {% endif %}
         </form>
     </div>
 

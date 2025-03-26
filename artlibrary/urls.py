@@ -18,4 +18,5 @@ urlpatterns = [
     path('', views.logout_view, name='logout'),
     path('collections/', views.collections, name='collections'),
     path('<int:id>/edit_collection/', views.update_collection, name='edit_collection'),
+    path('<int:id>/delete_collection/',views.delete_collection, name="delete_collection"),
 ]

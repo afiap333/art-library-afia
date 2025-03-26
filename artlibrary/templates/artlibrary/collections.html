@@ -137,6 +137,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="card-title text-brown">{{ collection.title }}</h5>
+                            <div class="d-flex flex-column justify-content-between align-items-center">
                             {% if collection.is_public %}
                             <span class="badge bg-success">Public</span>
                             {% else %}
@@ -145,6 +146,10 @@
                             {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
                             <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id%}">Edit</a></button>
                             {% endif %}
+                            {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
+                            <button type="submit" class="btn btn-danger"><a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a></button>
+                            {% endif %}
+                            </div>
                         </div>
                         <p class="card-text">{{ collection.description}}</p>
                         <p class="card-text"><small class="text-muted">Items: {{ collection.num_items }}</small></p>

@@ -178,3 +178,11 @@ def update_collection(request,id):
     else:
         form=AddCollectionForm(instance=collection)
     return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
+
+def delete_collection(request,id):
+    collection = get_object_or_404(Collection, id=id)
+    if request.method=='POST':
+        collection.delete()
+        return redirect('collections')
+    return render(request,'artlibrary/delete.html',{'collection':collection})
+
