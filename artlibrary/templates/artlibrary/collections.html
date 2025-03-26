@@ -69,11 +69,15 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Collections</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                    {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="#">Manage Users</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
@@ -138,8 +142,8 @@
                             {% else %}
                             <span class="badge bg-secondary">Private</span>
                             {% endif %}
-                            {% if request.user.id == collection.added_by.id %}
-                            <a href="?edit_collection={{ collection.id }}" class="btn btn-brown" data-bs-toggle="modal" data-bs-target="#editCollectionModal">Edit</a>
+                            {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
+                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id%}">Edit</a></button>
                             {% endif %}
                         </div>
                         <p class="card-text">{{ collection.description}}</p>
@@ -194,24 +198,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="editCollectionModal" tabindex="-1" aria-labelledby="editCollectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editCollectionModalLabel">EditCollection</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form edit_collection_form %}
-                        <button type="submit" class="btn btn-success w-100">Edit Collection</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>
 
 <!-- Footer -->

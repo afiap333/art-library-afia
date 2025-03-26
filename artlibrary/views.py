@@ -143,42 +143,21 @@ def collections(request):
         viewable_collections = Collection.objects.filter(is_public=True)
     add_item_form = AddArtSupplyForm()
     add_collection_form = AddCollectionForm(user=request.user)
-    edit_collection_form=EditCollectionForm()
     for collection in viewable_collections:
-    if request.method == "POST":
-        if "add_item" in request.POST:
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                art_supply = add_item_form.save(commit=False)
-                art_supply.added_by = request.user
-                art_supply.save()
-                return redirect('librarian_page')
-        elif "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                if (user_role == "librarian"):
+        if request.method == "POST":
+            if "add_item" in request.POST:
+                add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+                if add_item_form.is_valid():
+                    art_supply = add_item_form.save(commit=False)
+                    art_supply.added_by = request.user
+                    art_supply.save()
                     return redirect('librarian_page')
-                else:
-                    return redirect('patron_dashboard')
-        if 'edit_collection' in request.GET:
-            collection_id = request.GET['edit_collection']
-            collection = get_object_or_404(Collection, id=collection_id)
-            if collection.added_by != request.user and user_role != "librarian":
-                return redirect('permission_denied')
-            edit_collection_form = EditCollectionForm(instance=collection)
-            if request.method == 'POST':
-                edit_collection_form = EditCollectionForm(request.POST, instance=collection)
-                if 'delete_collection' in request.POST and request.POST.get('delete_collection') == 'on':
-                    collection.delete()
-                    if (user_role == "librarian"):
-                        return redirect('librarian_page')
-                    else:
-                        return redirect('patron_dashboard')
-                if edit_collection_form.is_valid():
-                    edit_collection_form.save()
+            elif "add_collection" in request.POST:
+                add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
+                if add_collection_form.is_valid():
+                    collection = add_collection_form.save(commit=False)
+                    collection.added_by = request.user
+                    collection.save()
                     if (user_role == "librarian"):
                         return redirect('librarian_page')
                     else:
@@ -187,6 +166,15 @@ def collections(request):
         'add_collection_form': add_collection_form,
         'viewable_collections': viewable_collections,
         'add_item_form': add_item_form,
-        'edit_collection_form':edit_collection_form,
     }
     return render(request, 'artlibrary/collections.html', context)
+def update_collection(request,id):
+    collection = get_object_or_404(Collection, id=id)
+    if request.method=='POST':
+        form=AddCollectionForm(request.POST,instance=collection)
+        if form.is_valid():
+            form.save()
+            return redirect('collections')
+    else:
+        form=AddCollectionForm(instance=collection)
+    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
