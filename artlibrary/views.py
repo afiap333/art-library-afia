@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from .models import ArtSupply, Message, CustomUser,Collection
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm,AddCollectionForm,EditCollectionForm
+from .forms import AddArtSupplyForm,AddCollectionForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
