@@ -4,14 +4,9 @@ from .models import ArtSupply,Collection
 from .models import CustomUser
 
 class AddArtSupplyForm(forms.ModelForm):
-    collection = forms.ModelChoiceField(
-        queryset=Collection.objects.all(), 
-        empty_label="Select a Collection", 
-        required=False
-    )
     class Meta:
         model = ArtSupply
-        fields = ['name', 'image', 'quantity', 'pickup_location','description','use_policy','item_type','collection']
+        fields = ['name', 'image', 'quantity', 'pickup_location','description','use_policy','item_type']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -20,7 +15,6 @@ class AddArtSupplyForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class': 'form-control'}),
             'use_policy':forms.TextInput(attrs={'class':'form-control'}),
             'item_type':forms.Select(attrs={'class':'form-control'}),
-            'collection': forms.SelectMultiple(attrs={'class': 'form-control'}),  
         }
 class AddCollectionForm(forms.ModelForm):
     class Meta:

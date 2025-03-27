@@ -69,7 +69,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
@@ -177,18 +177,6 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% bootstrap_form add_item_form %}
-                    {% if add_item_form.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for field in add_item_form %}
-                                    {% for error in field.errors %}
-                                        <li>{{ error }}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    
                     <button type="submit" class="btn btn-success w-100">Add Item</button>
                 </form>
             </div>

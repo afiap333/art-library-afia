@@ -66,10 +66,6 @@ def librarian_page(request):
             if add_item_form.is_valid():
                 artSupply = add_item_form.save(commit=False)
                 artSupply.added_by = request.user
-                if 'collection' in request.POST:
-                    collections = request.POST.getlist('collection') 
-                    artSupply.collection.set(collections)  
-                    artSupply.save()
                 artSupply.save()
                 return redirect('librarian_page')
         elif "add_collection" in request.POST:
@@ -89,6 +85,16 @@ def librarian_page(request):
         'collections': collections,
     }
     return render(request, 'artlibrary/librarian.html', context)
+
+def add_item(request):
+    add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+    if request.method == 'POST':
+            if add_item_form.is_valid():
+                artSupply = add_item_form.save(commit=False)
+                artSupply.added_by = request.user
+                artSupply.save()
+                return redirect('librarian_page')
+    return render(request,'artlibrary/add_item.html',{'add_item_form':add_item_form})
 
 
 def anonymous_page(request):
