@@ -193,7 +193,7 @@ def delete_collection(request,id):
     if request.method=='POST':
         collection.delete()
         return redirect('collections')
-    return render(request,'artlibrary/delete.html',{'collection':collection})
+    return render(request,'artlibrary/delete_collection.html',{'collection':collection})
 
 def update_item(request,id):
     supply = get_object_or_404(ArtSupply, id=id)

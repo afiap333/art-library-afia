@@ -38,10 +38,7 @@ class Collection(models.Model):
     def __str__(self):
         return self.title
     def update_num_items(self):
-        if(self.is_public):
-            self.num_items = self.public_items.count() 
-        else:
-            self.num_items = self.private_items.count()  
+        self.num_items = self.items.count()  
         self.save()
     
 class ArtSupply(models.Model):
