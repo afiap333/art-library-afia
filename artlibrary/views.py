@@ -96,7 +96,7 @@ def anonymous_page(request):
         user=request.user
     else:
         user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
-    available_items = ArtSupply.objects.filter(collection__is_public=True).filter(collection__isnull=True)
+    available_items = ArtSupply.objects.filter(Q(collection__isnull=True) | Q(collection__is_public=True))
     context = {
         'user':user,
         'available_items': available_items,
