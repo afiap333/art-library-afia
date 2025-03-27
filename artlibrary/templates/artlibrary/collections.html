@@ -72,13 +72,17 @@
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
                     {% endif %}
+                    {% if request.user.user_role != "anonymous_user" %}
                     <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="#">Manage Users</a></li>
                     {% endif %}
+                    {% if request.user.user_role != "anonymous_user" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
                     </li>
@@ -143,16 +147,19 @@
                             {% else %}
                             <span class="badge bg-secondary">Private</span>
                             {% endif %}
-                            {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
-                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id%}">Edit</a></button>
+                            {% if request.user.user_role == "patron" %}
+                            <button type="submit" class="btn btn-brown">Request Access</button>
                             {% endif %}
                             {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
+                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id%}">Edit</a></button>
                             <button type="submit" class="btn btn-danger"><a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a></button>
                             {% endif %}
                             </div>
                         </div>
                         <p class="card-text">{{ collection.description}}</p>
-                        <p class="card-text"><small class="text-muted">Items: {{ collection.num_items }}</small></p>
+                        {% if collection.is_public or request.user.user_role == "librarian"%}
+                        <p class="card-text"><small class="text-muted">Items: {{ num_items }}</small></p>
+                        {% endif %}
                         <div class="mt-3">
                         </div>
                     </div>

@@ -91,13 +91,13 @@
         </div>
     </nav>
     <div class="container mt-4">
-        <h2>Edit Collection</h2>
+        <h2>Edit Item</h2>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ edit_collection_form.as_p }}
-            <button type="submit" name="edit_collection" class="btn btn-success">Edit Collection</button>
-            {% if collection.id %}
-            <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
+            {{ edit_item_form.as_p }}
+            <button type="submit" name="edit_item" class="btn btn-success">Edit Item</button>
+            {% if item.id %}
+            <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
             {% endif %}
         </form>
     </div>

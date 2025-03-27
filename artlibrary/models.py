@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from storages.backends.s3boto3 import S3Boto3Storage
-
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -37,7 +37,12 @@ class Collection(models.Model):
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
     def __str__(self):
         return self.title
-
+    def update_num_items(self):
+        if(self.is_public):
+            self.num_items = self.public_items.count() 
+        else:
+            self.num_items = self.private_items.count()  
+        self.save()
     
 class ArtSupply(models.Model):
     STATUS = [
@@ -62,7 +67,7 @@ class ArtSupply(models.Model):
     item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='items', null=True, blank=True)
+    collection = models.ManyToManyField(Collection, related_name='items', blank=True)
     def __str__(self):
         return self.name
 
@@ -72,8 +77,3 @@ class Reviews(models.Model):
     rating=models.PositiveIntegerField()
     comment=models.TextField(null=True, blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
-class Keyword(models.Model):
-    collection = models.ForeignKey(ArtSupply, on_delete=models.CASCADE, related_name='keywords')
-    word=models.CharField(null=True,blank=True, max_length=100)
-    def __str__(self):
-        return self.word

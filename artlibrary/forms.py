@@ -1,7 +1,7 @@
 from django import forms
-from .models import ArtSupply,Collection, Keyword
+from django.core.exceptions import ValidationError
+from .models import ArtSupply,Collection
 from .models import CustomUser
-
 
 class AddArtSupplyForm(forms.ModelForm):
     collection = forms.ModelChoiceField(
@@ -9,14 +9,9 @@ class AddArtSupplyForm(forms.ModelForm):
         empty_label="Select a Collection", 
         required=False
     )
-    keywords=forms.CharField(
-        required=False,
-        help_text="Enter keywords seperated by commas",
-        widget=forms.TextInput(attrs={'class':'form-control'})
-    )
     class Meta:
         model = ArtSupply
-        fields = ['name', 'image', 'quantity', 'pickup_location','description','use_policy','item_type']
+        fields = ['name', 'image', 'quantity', 'pickup_location','description','use_policy','item_type','collection']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -25,18 +20,8 @@ class AddArtSupplyForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class': 'form-control'}),
             'use_policy':forms.TextInput(attrs={'class':'form-control'}),
             'item_type':forms.Select(attrs={'class':'form-control'}),
+            'collection': forms.SelectMultiple(attrs={'class': 'form-control'}),  
         }
-    def save(self,commit=True):
-        artSupply=super().save(commit=False)
-        if commit:
-            artSupply.save()
-            self.saveKeywords(artSupply)
-    def  saveKeywords(self, artSupply):
-        keywords=self.cleaned_data.get('keywords','')
-        if keywords:
-            keywordsList=[word.strip() for word in keywords.split(',') if word.strip()]
-            for word in keywordsList:
-                Keyword.objects.create(art_supply=ArtSupply,word=word)
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection

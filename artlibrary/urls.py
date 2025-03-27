@@ -19,4 +19,6 @@ urlpatterns = [
     path('collections/', views.collections, name='collections'),
     path('<int:id>/edit_collection/', views.update_collection, name='edit_collection'),
     path('<int:id>/delete_collection/',views.delete_collection, name="delete_collection"),
+    path('<int:id>/edit_item/', views.update_item, name='edit_item'),
+    path('<int:id>/delete_item',views.delete_item, name="delete_item"),
 ]
