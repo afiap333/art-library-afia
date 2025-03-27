@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
 from django.db import models
+from django.db.models import Q
 from .forms import ProfileForm
 from django.contrib import messages
 
@@ -104,7 +105,7 @@ def anonymous_page(request):
 
 @login_required
 def patron_page(request):
-    available_items = ArtSupply.objects.filter(collection__is_public=True).filter(collection__isnull=True)
+    available_items = ArtSupply.objects.filter(Q(collection__isnull=True) | Q(collection__is_public=True))
     messages = Message.objects.filter(recipient=request.user)
     add_collection_form = AddCollectionForm(user=request.user)
     if request.method == "POST":

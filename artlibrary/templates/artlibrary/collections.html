@@ -147,7 +147,7 @@
                             {% else %}
                             <span class="badge bg-secondary">Private</span>
                             {% endif %}
-                            {% if request.user.user_role == "patron" %}
+                            {% if request.user.user_role == "patron" and not collection.is_public %}
                             <button type="submit" class="btn btn-brown">Request Access</button>
                             {% endif %}
                             {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
