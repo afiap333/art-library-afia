@@ -31,10 +31,11 @@ class Message(models.Model):
 class Collection(models.Model):
     title=models.CharField(max_length=255)
     description=models.TextField(blank=True,null=True)
-    num_items=models.PositiveIntegerField(default=0)
+
     is_public=models.BooleanField(default=True)
     users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
+    items=
     def __str__(self):
         return self.title
     def update_num_items(self):
@@ -64,7 +65,6 @@ class ArtSupply(models.Model):
     item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
-    collection = models.ManyToManyField(Collection, related_name='items', blank=True)
     def __str__(self):
         return self.name
 
