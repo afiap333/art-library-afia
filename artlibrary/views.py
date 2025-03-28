@@ -86,15 +86,16 @@ def librarian_page(request):
     }
     return render(request, 'artlibrary/librarian.html', context)
 
-def add_item(request):
-    add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-    if request.method == 'POST':
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                return redirect('librarian_page')
-    return render(request,'artlibrary/add_item.html',{'add_item_form':add_item_form})
+def add_item(request,id):
+
+    if request.method=='POST':
+        form=AddCollectionForm(request.POST,instance=collection)
+        if form.is_valid():
+            form.save()
+            return redirect('collections')
+    else:
+        form=AddCollectionForm(instance=collection)
+    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
 
 
 def anonymous_page(request):
@@ -152,8 +153,6 @@ def collections(request):
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
-    for collection in viewable_collections:
-        collection.update_num_items()
     add_item_form = AddArtSupplyForm()
     add_collection_form = AddCollectionForm(user=request.user)
     if request.method == "POST":
