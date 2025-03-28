@@ -28,20 +28,6 @@ class Message(models.Model):
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-class Collection(models.Model):
-    title=models.CharField(max_length=255)
-    description=models.TextField(blank=True,null=True)
-
-    is_public=models.BooleanField(default=True)
-    users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
-    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
-    items=
-    def __str__(self):
-        return self.title
-    def update_num_items(self):
-        self.num_items = self.items.count()  
-        self.save()
-    
 class ArtSupply(models.Model):
     STATUS = [
         ('available', 'Available'), 
@@ -67,6 +53,16 @@ class ArtSupply(models.Model):
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
     def __str__(self):
         return self.name
+    
+class Collection(models.Model):
+    title=models.CharField(max_length=255)
+    description=models.TextField(blank=True,null=True)
+    is_public=models.BooleanField(default=True)
+    users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
+    items=models.ManyToManyField(ArtSupply,blank=True,related_name='inCollections')
+    def __str__(self):
+        return self.title
 
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')
