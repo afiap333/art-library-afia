@@ -220,3 +220,20 @@ def delete_item(request,id):
         return redirect('librarian_page')
     return render(request,'artlibrary/delete_item.html')
 
+def item_details(request,id):
+    supply = get_object_or_404(ArtSupply, id=id)
+    add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+    if request.method == "POST":
+        if "add_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+            if add_collection_form.is_valid():
+                collection = add_collection_form.save(commit=False)
+                collection.added_by = request.user
+                collection.save()
+                return redirect('patron_page')
+    context = {
+        'add_collection_form': add_collection_form,
+        'messages': messages,
+        'item':supply,
+    }
+    return render(request, 'artlibrary/item_details.html', context)

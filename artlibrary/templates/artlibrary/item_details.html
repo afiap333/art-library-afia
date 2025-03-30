@@ -1,0 +1,136 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patron Dashboard</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">View Item</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+   
+    <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCollectionModalLabel">{{item.name}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form add_collection_form %}
+                        <button type="submit" name="add_collection" class="btn btn-success w-100">Add Collection</button> 
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Art Supplies -->
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4 col-sm-6">
+                        <img src="{{ item.image.url }}"class="img-fluid" alt="{{ item.name }}">
+                                <h5 class="card-title text-brown">{{ item.name }}</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                            <h6>Quantity<h6> <p>{{ item.quantity }}</p>
+                            <h6 class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                            <h6 class="card-text"><small class="text-muted">Use policy: {{ item.use_policy}}</small></p>
+                            <h6 class="card-text"><small class="text-muted">Description: {{ item.description}}</small></p>
+                            <h6 class="card-text"><small class="text-muted">Use type: {{ item.item_type}}</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+    <footer class="py-3 bg-dark text-white mt-auto bg-brown">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                    <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
