@@ -29,16 +29,19 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 class Collection(models.Model):
-    title=models.CharField(max_length=255)
-    description=models.TextField(blank=True,null=True)
-    num_items=models.PositiveIntegerField(default=0)
-    is_public=models.BooleanField(default=True)
-    users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
-    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    num_items = models.PositiveIntegerField(default=0)
+    is_public = models.BooleanField(default=True)
+    users = models.ManyToManyField(CustomUser, blank=True, related_name='collections')
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections', default=2)
+    art_supplies = models.ManyToManyField('ArtSupply', blank=True, related_name='collections_in')
+
     def __str__(self):
         return self.title
+
     def update_num_items(self):
-        self.num_items = self.items.count()  
+        self.num_items = self.art_supplies.count()
         self.save()
     
 class ArtSupply(models.Model):

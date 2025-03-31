@@ -19,23 +19,29 @@ class AddArtSupplyForm(forms.ModelForm):
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
-        fields = ['title', 'description', 'is_public']
+        fields = ['title', 'description', 'is_public', 'users']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'is_public_checkbox'}),
+            'users': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'display:none;'}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if self.instance and self.instance.is_public:
-            self.fields['private_users'] = forms.ModelMultipleChoiceField(
+        
+        if user and user.user_role == 'patron':
+            self.fields['is_public'].widget = forms.HiddenInput()
+            self.fields['users'].widget = forms.HiddenInput()
+            del self.fields['is_public']
+            del self.fields['users']
+        else:
+            self.fields['users'] = forms.ModelMultipleChoiceField(
                 queryset=CustomUser.objects.all(),
                 required=False,
                 widget=forms.SelectMultiple(attrs={'class': 'form-control'})
             )
- 
+
 class ProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False)
     user_role = forms.ChoiceField(choices=CustomUser.roles, required=True)

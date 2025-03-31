@@ -97,20 +97,18 @@ def add_item(request):
             artSupply.save()
 
             selected_public_collections = request.POST.getlist("public_collections")
-
-            selected_private_collection = request.POST.get("private_collection")
-
             for collection_id in selected_public_collections:
                 collection = Collection.objects.get(id=collection_id)
-                artSupply.collection.add(collection)
+                collection.art_supplies.add(artSupply)
 
+            selected_private_collection = request.POST.get("private_collection")
             if selected_private_collection:
                 private_collection = Collection.objects.get(id=selected_private_collection)
-                artSupply.collection.add(private_collection)
+                private_collection.art_supplies.add(artSupply)
 
-            for collection in artSupply.collection.all():
+            for collection in Collection.objects.filter(art_supplies=artSupply):
                 collection.update_num_items()
-                
+
             messages.success(request, "Item added successfully!")
             return redirect('librarian_page')
 
@@ -118,7 +116,6 @@ def add_item(request):
         'add_item_form': add_item_form,
         'collections': collections
     })
-
 
 def anonymous_page(request):
     if request.user.is_authenticated:
@@ -275,27 +272,38 @@ def edit_item(request, item_id):
 
 def add_collection(request):
     if request.method == "POST":
-        form = CollectionForm(request.POST)
+        print("Form submitted!")
+        form = AddCollectionForm(request.POST)
         if form.is_valid():
-            collection = form.save(commit=False)
+            print("Form is valid!")
 
+            collection = form.save(commit=False)
+            collection.added_by = request.user
             collection.save()
 
             if not collection.is_public:
-                selected_users = request.POST.getlist("private_users")
-                collection.allowed_users.set(User.objects.filter(id__in=selected_users))
+                selected_users_ids = request.POST.getlist("private_users")
+                print("Selected user IDs:", selected_users_ids)
 
-            collection.save()
+                selected_users = CustomUser.objects.filter(id__in=selected_users_ids)
+                print("Selected Users:", selected_users)
+
+                if selected_users.exists():
+                    collection.users.set(selected_users)
+                    print("Users successfully added to collection!")
+                else:
+                    print("No users were selected.")
+
             return redirect("collections")
-
+        else:
+            print("Form errors:", form.errors)
     else:
-        form = CollectionForm()
+        form = AddCollectionForm()
 
-    users = CustomUser.objects.all()  # Fetch all users
+    users = CustomUser.objects.all()
+
     context = {
-        'add_collection_form': add_collection_form,
-        'viewable_collections': viewable_collections,
-        'add_item_form': add_item_form,
-        'users': users  # Pass users to the template
+        'add_collection_form': form,
+        'users': users
     }
     return render(request, 'artlibrary/collections.html', context)
