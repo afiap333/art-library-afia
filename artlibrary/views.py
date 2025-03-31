@@ -221,19 +221,25 @@ def delete_item(request,id):
     return render(request,'artlibrary/delete_item.html')
 
 def item_details(request,id):
-    supply = get_object_or_404(ArtSupply, id=id)
-    add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+    item = get_object_or_404(ArtSupply, id=id)
+    collections = Collection.objects.all()
+
+    # Initialize form without POST data
+    add_collection_form = AddCollectionForm(user=request.user)
+
     if request.method == "POST":
-        if "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
+        if "add_to_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
             if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('patron_page')
+                collection_ids = request.POST.getlist('collections')  # Get selected collections
+                selected_collections = Collection.objects.filter(id__in=collection_ids)
+                for collection in selected_collections:
+                    collection.items.add(item)  # Add item to each selected collection
+                return redirect('item_details', id=id)
+
     context = {
         'add_collection_form': add_collection_form,
-        'messages': messages,
-        'item':supply,
+        'item': item,
+        'collections': collections,
     }
     return render(request, 'artlibrary/item_details.html', context)
