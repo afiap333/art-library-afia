@@ -58,63 +58,68 @@
     </style>
 </head>
 <body class="bg-light">
-
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
-        <div class="container">
-            <a class="navbar-brand" href="#">Collections Page</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    {% if request.user.user_role == "librarian" %}
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
-                    {% endif %}
-                    {% if request.user.user_role != "anonymous_user" %}
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
-                    {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
-                    {% if request.user.user_role == "librarian" %}
-                    <li class="nav-item"><a class="nav-link" href="#">Manage Users</a></li>
-                    {% endif %}
-                    {% if request.user.user_role != "anonymous_user" %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
     <div class="container mt-4">
-        <h2>Edit Collection</h2>
+        <h2>Add Item</h2>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ add_item_form.as_p }}
+            
+            <div class="mb-3">
+                <label class="form-label">Select Public Collections</label>
+                <div>
+                    {% for collection in collections %}
+                        {% if collection.is_public %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="public_collections" value="{{ collection.id }}" id="public_{{ collection.id }}">
+                                <label class="form-check-label" for="public_{{ collection.id }}">
+                                    {{ collection.title }}
+                                </label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="private_collection" class="form-label">Select Private Collection (Only One)</label>
+                <select id="private_collection" name="private_collection" class="form-select">
+                    <option value="">None</option>
+                    {% for collection in collections %}
+                        {% if not collection.is_public %}
+                            <option value="{{ collection.id }}">{{ collection.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            
             <button type="submit" name="add_item" class="btn btn-success">Add Item</button>
         </form>
     </div>
 
-</body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const collectionSelect = document.getElementById("collections");
+            collectionSelect.addEventListener("change", function () {
+                let selectedOptions = Array.from(collectionSelect.selectedOptions);
+                let privateCollections = selectedOptions.filter(opt => opt.dataset.public === "False");
+                
+                if (privateCollections.length > 1) {
+                    alert("You can only select one private collection.");
+                    privateCollections.forEach(opt => opt.selected = false);
+                }
+            });
+        });
 
-<!-- Footer -->
-<footer class="py-3 bg-dark text-white mt-auto bg-brown">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
-                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
-                <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
-            </div>
-        </div>
-    </div>
-</footer>
+        document.addEventListener("DOMContentLoaded", function () {
+    const privateCollectionSelect = document.getElementById("private_collection");
+
+    privateCollectionSelect.addEventListener("change", function () {
+        if (privateCollectionSelect.value !== "") {
+            alert("You can only select one private collection.");
+        }
+    });
+});
+
+    </script>
 </body>
 </html>

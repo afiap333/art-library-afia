@@ -87,14 +87,39 @@ def librarian_page(request):
     return render(request, 'artlibrary/librarian.html', context)
 
 def add_item(request):
-    add_item_form = AddArtSupplyForm(request.POST, request.FILES)
+    collections = Collection.objects.all()
+    add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
+
     if request.method == 'POST':
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                return redirect('librarian_page')
-    return render(request,'artlibrary/add_item.html',{'add_item_form':add_item_form})
+        if add_item_form.is_valid():
+            artSupply = add_item_form.save(commit=False)
+            artSupply.added_by = request.user
+            artSupply.save()
+
+            selected_public_collections = request.POST.getlist("public_collections")
+
+            selected_private_collection = request.POST.get("private_collection")
+
+            for collection_id in selected_public_collections:
+                collection = Collection.objects.get(id=collection_id)
+                artSupply.collection.add(collection)
+
+            if selected_private_collection:
+                private_collection = Collection.objects.get(id=selected_private_collection)
+                artSupply.collection.add(private_collection)
+
+            # Update item count for associated collections
+            for collection in artSupply.collection.all():
+                collection.update_num_items()
+                collection.up
+
+            messages.success(request, "Item added successfully!")
+            return redirect('librarian_page')
+
+    return render(request, 'artlibrary/add_item.html', {
+        'add_item_form': add_item_form,
+        'collections': collections
+    })
 
 
 def anonymous_page(request):
