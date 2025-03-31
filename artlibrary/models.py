@@ -53,6 +53,11 @@ class ArtSupply(models.Model):
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
     def __str__(self):
         return self.name
+
+    def clean(self):
+        #Ensure only librarian can add items.
+        if not self.added_by.librarian_check():
+            raise ValidationError("Only librarians can add items.")
     
 class Collection(models.Model):
     title=models.CharField(max_length=255)
