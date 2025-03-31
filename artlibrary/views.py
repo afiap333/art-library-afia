@@ -121,7 +121,7 @@ def anonymous_page(request):
         user=request.user
     else:
         user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
-    available_items = ArtSupply.objects.filter(Q(collection__isnull=True) | Q(collection__is_public=True))
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
     context = {
         'user':user,
         'available_items': available_items,
@@ -130,7 +130,7 @@ def anonymous_page(request):
 
 @login_required
 def patron_page(request):
-    available_items = ArtSupply.objects.filter(Q(collection__isnull=True) | Q(collection__is_public=True))
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
     messages = Message.objects.filter(recipient=request.user)
     add_collection_form = AddCollectionForm(user=request.user)
     if request.method == "POST":
