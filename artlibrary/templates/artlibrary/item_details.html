@@ -91,10 +91,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST">
                         {% csrf_token %}
-                        {% bootstrap_form add_collection_form %}
-                        <button type="submit" name="add_collection" class="btn btn-success w-100">Add Collection</button> 
+                        <h5>Select Collections to Add Item</h5>
+                        <select name="collections" multiple class="form-control mb-3">
+                            {% for collection in collections %}
+                                <option value="{{ collection.id }}">{{ collection.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="add_to_collection" class="btn btn-success w-100">Add to Collection</button>
                     </form>
                 </div>
             </div>
