@@ -28,25 +28,7 @@ class Message(models.Model):
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-<<<<<<< HEAD
-class Collection(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    num_items = models.PositiveIntegerField(default=0)
-    is_public = models.BooleanField(default=True)
-    users = models.ManyToManyField(CustomUser, blank=True, related_name='collections')
-    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections', default=2)
-    art_supplies = models.ManyToManyField('ArtSupply', blank=True, related_name='collections_in')
-
-    def __str__(self):
-        return self.title
-
-    def update_num_items(self):
-        self.num_items = self.art_supplies.count()
-        self.save()
-    
-=======
->>>>>>> development
+ 
 class ArtSupply(models.Model):
     STATUS = [
         ('available', 'Available'), 
@@ -79,14 +61,20 @@ class ArtSupply(models.Model):
             raise ValidationError("Only librarians can add items.")
     
 class Collection(models.Model):
-    title=models.CharField(max_length=255)
-    description=models.TextField(blank=True,null=True)
-    is_public=models.BooleanField(default=True)
-    users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
-    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
-    items=models.ManyToManyField(ArtSupply,blank=True,related_name='inCollections')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    num_items = models.PositiveIntegerField(default=0)
+    is_public = models.BooleanField(default=True)
+    users = models.ManyToManyField(CustomUser, blank=True, related_name='collections')
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections', default=2)
+    art_supplies = models.ManyToManyField('ArtSupply', blank=True, related_name='collections_in')
+
     def __str__(self):
         return self.title
+
+    def update_num_items(self):
+        self.num_items = self.art_supplies.count()
+        self.save()
 
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')

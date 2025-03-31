@@ -27,7 +27,6 @@ class DeleteArtSupplyGorm(forms.Form):
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
-<<<<<<< HEAD
         fields = ['title', 'description', 'is_public', 'users']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -50,23 +49,8 @@ class AddCollectionForm(forms.ModelForm):
                 required=False,
                 widget=forms.SelectMultiple(attrs={'class': 'form-control'})
             )
-
-=======
-        fields = ['title', 'description', 'is_public','items']
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.NumberInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), 
-            'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'items':forms.CheckboxSelectMultiple(attrs={'class':'form-control'}),
-        }
-    def __init__(self,*args,user=None,**kwargs):
-        super().__init__(*args,**kwargs)
-        if user and user.user_role!='librarian':
-             self.fields.pop('is_public',None)
     
  
->>>>>>> development
 class ProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False)
     user_role = forms.ChoiceField(choices=CustomUser.roles, required=True)

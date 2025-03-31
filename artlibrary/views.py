@@ -86,23 +86,9 @@ def librarian_page(request):
     }
     return render(request, 'artlibrary/librarian.html', context)
 
-<<<<<<< HEAD
 def add_item(request):
     collections = Collection.objects.all()
     add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
-=======
-def add_item(request,id):
-
-    if request.method=='POST':
-        form=AddCollectionForm(request.POST,instance=collection)
-        if form.is_valid():
-            form.save()
-            return redirect('collections')
-    else:
-        form=AddCollectionForm(instance=collection)
-    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
->>>>>>> development
-
     if request.method == 'POST':
         if add_item_form.is_valid():
             artSupply = add_item_form.save(commit=False)
@@ -187,6 +173,8 @@ def collections(request):
         viewable_collections = Collection.objects.all()
     add_item_form = AddArtSupplyForm()
     add_collection_form = AddCollectionForm(user=request.user)
+    for collection in Collection.objects.all():
+        collection.update_num_items()
     if request.method == "POST":
         if "add_item" in request.POST:
             add_item_form = AddArtSupplyForm(request.POST, request.FILES)
@@ -252,13 +240,12 @@ def delete_item(request,id):
         return redirect('librarian_page')
     return render(request,'artlibrary/delete_item.html')
 
-<<<<<<< HEAD
 def edit_item(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
+    item = get_object_or_404(ArtSupply, id=item_id)
     all_collections = Collection.objects.all()
 
     if request.method == "POST":
-        form = EditItemForm(request.POST, instance=item)
+        form = AddArtSupplyForm(request.POST, instance=item)
         if form.is_valid():
             item = form.save(commit=False)
 
@@ -274,7 +261,7 @@ def edit_item(request, item_id):
             return redirect("some_view")
 
     else:
-        form = EditItemForm(instance=item)
+        form = AddArtSupplyForm(instance=item)
 
     return render(request, "edit_item.html", {
         "edit_item_form": form,
@@ -319,7 +306,6 @@ def add_collection(request):
         'users': users
     }
     return render(request, 'artlibrary/collections.html', context)
-=======
 def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
@@ -343,4 +329,3 @@ def item_details(request,id):
         'collections': collections,
     }
     return render(request, 'artlibrary/item_details.html', context)
->>>>>>> development
