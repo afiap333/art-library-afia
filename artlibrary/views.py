@@ -108,11 +108,9 @@ def add_item(request):
                 private_collection = Collection.objects.get(id=selected_private_collection)
                 artSupply.collection.add(private_collection)
 
-            # Update item count for associated collections
             for collection in artSupply.collection.all():
                 collection.update_num_items()
-                collection.up
-
+                
             messages.success(request, "Item added successfully!")
             return redirect('librarian_page')
 
@@ -246,3 +244,58 @@ def delete_item(request,id):
         return redirect('librarian_page')
     return render(request,'artlibrary/delete_item.html')
 
+def edit_item(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    all_collections = Collection.objects.all()
+
+    if request.method == "POST":
+        form = EditItemForm(request.POST, instance=item)
+        if form.is_valid():
+            item = form.save(commit=False)
+
+            selected_public_collections = Collection.objects.filter(id__in=request.POST.getlist("public_collections"))
+            selected_private_collection = Collection.objects.filter(id=request.POST.get("private_collection")).first()
+
+            if selected_private_collection:
+                item.collections.set([selected_private_collection])
+            else:
+                item.collections.set(selected_public_collections)
+
+            item.save()
+            return redirect("some_view")
+
+    else:
+        form = EditItemForm(instance=item)
+
+    return render(request, "edit_item.html", {
+        "edit_item_form": form,
+        "item": item,
+        "collections": all_collections 
+    })
+
+def add_collection(request):
+    if request.method == "POST":
+        form = CollectionForm(request.POST)
+        if form.is_valid():
+            collection = form.save(commit=False)
+
+            collection.save()
+
+            if not collection.is_public:
+                selected_users = request.POST.getlist("private_users")
+                collection.allowed_users.set(User.objects.filter(id__in=selected_users))
+
+            collection.save()
+            return redirect("collections")
+
+    else:
+        form = CollectionForm()
+
+    users = CustomUser.objects.all()  # Fetch all users
+    context = {
+        'add_collection_form': add_collection_form,
+        'viewable_collections': viewable_collections,
+        'add_item_form': add_item_form,
+        'users': users  # Pass users to the template
+    }
+    return render(request, 'artlibrary/collections.html', context)

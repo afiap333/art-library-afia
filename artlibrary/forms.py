@@ -19,18 +19,22 @@ class AddArtSupplyForm(forms.ModelForm):
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
-        fields = ['title','description','is_public']
         fields = ['title', 'description', 'is_public']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.NumberInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), 
-            'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'is_public_checkbox'}),
         }
-    def __init__(self,*args,user=None,**kwargs):
-        super().__init__(*args,**kwargs)
-        if user and user.user_role!='librarian':
-             self.fields.pop('is_public',None)
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.is_public:
+            self.fields['private_users'] = forms.ModelMultipleChoiceField(
+                queryset=CustomUser.objects.all(),
+                required=False,
+                widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+            )
  
 class ProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False)

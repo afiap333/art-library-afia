@@ -95,12 +95,62 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ edit_item_form.as_p }}
-            <button type="submit" name="edit_item" class="btn btn-success">Edit Item</button>
+            
+            <!-- Public Collections -->
+            <div class="mb-3">
+                <label class="form-label">Public Collections</label>
+                <div>
+                    {% for collection in collections %}
+                        {% if collection.is_public %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="public_collections" value="{{ collection.id }}" id="public_{{ collection.id }}"
+                                    {% if collection in item.collections.all %}checked{% endif %}>
+                                <label class="form-check-label" for="public_{{ collection.id }}">
+                                    {{ collection.title }}
+                                </label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Private Collection -->
+            <div class="mb-3">
+                <label for="private_collection" class="form-label">Private Collection (Only One)</label>
+                <select id="private_collection" name="private_collection" class="form-select">
+                    <option value="">None</option>
+                    {% for collection in collections %}
+                        {% if not collection.is_public %}
+                            <option value="{{ collection.id }}" 
+                                {% if collection in item.collections.all %}selected{% endif %}>
+                                {{ collection.title }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <button type="submit" name="edit_item" class="btn btn-success">Save Changes</button>
             {% if item.id %}
             <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
             {% endif %}
         </form>
-    </div>
+    </div>    
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const privateCollectionSelect = document.getElementById("private_collection");
+        const publicCollectionCheckboxes = document.querySelectorAll("input[name='public_collections']");
+
+        privateCollectionSelect.addEventListener("change", function () {
+            if (privateCollectionSelect.value !== "") {
+                publicCollectionCheckboxes.forEach(checkbox => checkbox.disabled = true);
+            } else {
+                publicCollectionCheckboxes.forEach(checkbox => checkbox.disabled = false);
+            }
+        });
+    });
+    </script>
 
 </body>
 
