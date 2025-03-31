@@ -86,9 +86,22 @@ def librarian_page(request):
     }
     return render(request, 'artlibrary/librarian.html', context)
 
+<<<<<<< HEAD
 def add_item(request):
     collections = Collection.objects.all()
     add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
+=======
+def add_item(request,id):
+
+    if request.method=='POST':
+        form=AddCollectionForm(request.POST,instance=collection)
+        if form.is_valid():
+            form.save()
+            return redirect('collections')
+    else:
+        form=AddCollectionForm(instance=collection)
+    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
+>>>>>>> development
 
     if request.method == 'POST':
         if add_item_form.is_valid():
@@ -172,8 +185,6 @@ def collections(request):
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
-    for collection in viewable_collections:
-        collection.update_num_items()
     add_item_form = AddArtSupplyForm()
     add_collection_form = AddCollectionForm(user=request.user)
     if request.method == "POST":
@@ -241,6 +252,7 @@ def delete_item(request,id):
         return redirect('librarian_page')
     return render(request,'artlibrary/delete_item.html')
 
+<<<<<<< HEAD
 def edit_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     all_collections = Collection.objects.all()
@@ -307,3 +319,28 @@ def add_collection(request):
         'users': users
     }
     return render(request, 'artlibrary/collections.html', context)
+=======
+def item_details(request,id):
+    item = get_object_or_404(ArtSupply, id=id)
+    collections = Collection.objects.all()
+
+    # Initialize form without POST data
+    add_collection_form = AddCollectionForm(user=request.user)
+
+    if request.method == "POST":
+        if "add_to_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
+            if add_collection_form.is_valid():
+                collection_ids = request.POST.getlist('collections')  # Get selected collections
+                selected_collections = Collection.objects.filter(id__in=collection_ids)
+                for collection in selected_collections:
+                    collection.items.add(item)  # Add item to each selected collection
+                return redirect('item_details', id=id)
+
+    context = {
+        'add_collection_form': add_collection_form,
+        'item': item,
+        'collections': collections,
+    }
+    return render(request, 'artlibrary/item_details.html', context)
+>>>>>>> development

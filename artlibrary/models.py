@@ -28,6 +28,7 @@ class Message(models.Model):
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+<<<<<<< HEAD
 class Collection(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -44,6 +45,8 @@ class Collection(models.Model):
         self.num_items = self.art_supplies.count()
         self.save()
     
+=======
+>>>>>>> development
 class ArtSupply(models.Model):
     STATUS = [
         ('available', 'Available'), 
@@ -67,9 +70,23 @@ class ArtSupply(models.Model):
     item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
-    collection = models.ManyToManyField(Collection, related_name='items', blank=True)
     def __str__(self):
         return self.name
+
+    def clean(self):
+        #Ensure only librarian can add items.
+        if not self.added_by.librarian_check():
+            raise ValidationError("Only librarians can add items.")
+    
+class Collection(models.Model):
+    title=models.CharField(max_length=255)
+    description=models.TextField(blank=True,null=True)
+    is_public=models.BooleanField(default=True)
+    users=models.ManyToManyField(CustomUser,blank=True,related_name='collections')
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_collections',default=2)
+    items=models.ManyToManyField(ArtSupply,blank=True,related_name='inCollections')
+    def __str__(self):
+        return self.title
 
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')
