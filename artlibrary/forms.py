@@ -16,6 +16,14 @@ class AddArtSupplyForm(forms.ModelForm):
             'use_policy':forms.TextInput(attrs={'class':'form-control'}),
             'item_type':forms.Select(attrs={'class':'form-control'}),
         }
+
+class DeleteArtSupplyGorm(forms.Form):
+    #simple confirmation form for deleting an art supply item.
+    confirm = forms.BooleanField(
+        required=True,
+        label="Are you sure you want to delete this item?"
+    )
+
 class AddCollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
