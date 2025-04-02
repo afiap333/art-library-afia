@@ -211,12 +211,12 @@ def collections(request):
 def update_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
     if request.method=='POST':
-        form=AddCollectionForm(request.POST,instance=collection)
+        form=AddCollectionForm(request.POST,instance=collection,user=request.user)
         if form.is_valid():
             form.save()
             return redirect('collections')
     else:
-        form=AddCollectionForm(instance=collection)
+        form=AddCollectionForm(instance=collection,user=request.user)
     return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
 
 def delete_collection(request,id):
