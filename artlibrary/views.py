@@ -85,8 +85,13 @@ def librarian_page(request):
         'collections': collections,
     }
     return render(request, 'artlibrary/librarian.html', context)
-
+@login_required
 def add_item(request):
+    if(request.user.user_role!="librarian"):
+        if request.user.user_role=="anonymous":
+            return redirect("anonymous_page")
+        else:
+            return redirect("patron_page")
     collections = Collection.objects.all()
     add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':

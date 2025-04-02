@@ -130,7 +130,11 @@
             {% for item in available_items %}
             <div class="col-md-4 col-sm-6">
                 <div class="card h-100 shadow-sm">
-                    <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="Item Image">
+                    {% else %}
+                        <p>No image available</p>
+                    {% endif %}
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="card-title text-brown">{{ item.name }}</h5>
