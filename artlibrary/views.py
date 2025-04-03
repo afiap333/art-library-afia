@@ -334,3 +334,18 @@ def item_details(request,id):
         'collections': collections,
     }
     return render(request, 'artlibrary/item_details.html', context)
+def manage_users(request):
+    if(request.user.user_role!="librarian"):
+        if request.user.user_role=="anonymous":
+            return redirect("anonymous_page")
+        else:
+            return redirect("patron_page")
+    usersList= CustomUser.objects.all()
+    context={'all_users':usersList}
+    return render(request,'artlibrary/manage_users.html',context)
+    
+def make_librarian(request, id):
+    userToUpgrade=get_object_or_404(CustomUser, id=id)
+    userToUpgrade.user_role="librarian"
+    userToUpgrade.save()
+    return redirect("manage_users")

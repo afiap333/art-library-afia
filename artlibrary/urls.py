@@ -23,4 +23,6 @@ urlpatterns = [
     path('<int:id>/delete_item',views.delete_item, name="delete_item"),
     path('add_item/',views.add_item,name="add_item"),
     path('<int:id>/item_details/',views.item_details,name="item_details"),
+    path('manage_users/',views.manage_users,name="manage_users"),
+    path('<int:id>/make_librarian/',views.make_librarian,name="make_librarian"),
 ]
