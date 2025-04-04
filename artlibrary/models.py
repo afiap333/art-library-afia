@@ -71,6 +71,20 @@ class Collection(models.Model):
         self.num_items = self.art_supplies.count()
         self.save()
 
+class CollectionRequest(models.Model):
+   collection=models.ForeignKey(Collection,on_delete=models.CASCADE,related_name="requests_for_collection",default=None)
+   patron = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="requested_collections")
+   librarian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="collection_requests")
+   timestamp=models.DateTimeField(auto_now_add=True)
+   is_approved=models.BooleanField(default=False)
+
+class ArtSupplyRequest(models.Model):
+   item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name="requests_for_item",default=None)
+   patron = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="requested_items")
+   librarian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="item_requests")
+   timestamp=models.DateTimeField(auto_now_add=True)
+   is_approved=models.BooleanField(default=False)
+
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)

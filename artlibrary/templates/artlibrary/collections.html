@@ -147,17 +147,17 @@
                             {% else %}
                             <span class="badge bg-secondary">Private</span>
                             {% endif %}
-                            {% if request.user.user_role == "patron" and not collection.is_public %}
-                            <button type="submit" class="btn btn-brown">Request Access</button>
+                            {% if request.user.user_role == "patron" and not collection.is_public and not request.user in collection.users.all %}
+                            <button type="submit" class="btn btn-brown"><a href="{% url 'request_collection' collection.id %}">Request access</a></button>
                             {% endif %}
                             {% if collection.added_by.id == request.user.id or request.user.user_role == "librarian" %}
-                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id%}">Edit</a></button>
+                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_collection' collection.id %}">Edit</a></button>
                             <button type="submit" class="btn btn-danger"><a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a></button>
                             {% endif %}
                             </div>
                         </div>
                         <p class="card-text">{{ collection.description}}</p>
-                        {% if collection.is_public or request.user.user_role == "librarian"%}
+                        {% if collection.is_public or request.user.user_role == "librarian" or request.user in collection.users.all %}
                         <p class="card-text"><small class="text-muted">Items: {{ collection.num_items }}</small></p>
                         <p class="card-text"><small class="text-muted">Created by: {{ collection.added_by }}</small></p>
                             {% if not collection.is_public %}

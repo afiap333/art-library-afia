@@ -1,6 +1,6 @@
 from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser,Collection
+from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm,AddCollectionForm
@@ -349,3 +349,27 @@ def make_librarian(request, id):
     userToUpgrade.user_role="librarian"
     userToUpgrade.save()
     return redirect("manage_users")
+def view_requests(request,id):
+    collectionRequests=CollectionRequest.objects.filter(librarian__id=id)
+    context={
+        'collectionRequests':collectionRequests,
+    }
+    return render(request,'artlibrary/collection_requests.html',context)
+
+def approve_collection_request(request,id):
+    collectionRequest=get_object_or_404(CollectionRequest,id=id)
+    collectionRequest.collection.users.add(collectionRequest.patron)
+    collectionRequest.collection.save()
+    collectionRequest.is_approved=True
+    collectionRequest.save()
+    return redirect("view_requests",id=request.user.id)
+
+
+def request_collection(request,id):
+    collectionRequested=get_object_or_404(Collection,id=id)
+    existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
+    if existing_request:
+        return redirect("collections")
+    request=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
+    messages.success("Your request has been submitted successfully!")
+    return redirect("collections")
