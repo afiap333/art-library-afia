@@ -158,6 +158,7 @@
                         </div>
                         <p class="card-text">{{ collection.description}}</p>
                         {% if collection.is_public or request.user.user_role == "librarian" or request.user in collection.users.all %}
+                        <button type="submit" class="btn btn-danger"><a href="{% url 'collection_details' collection.id %}" class="btn btn-danger">View collection</a></button>
                         <p class="card-text"><small class="text-muted">Items: {{ collection.num_items }}</small></p>
                         <p class="card-text"><small class="text-muted">Created by: {{ collection.added_by }}</small></p>
                             {% if not collection.is_public %}

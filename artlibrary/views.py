@@ -373,3 +373,12 @@ def request_collection(request,id):
     request=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
     messages.success("Your request has been submitted successfully!")
     return redirect("collections")
+
+def collection_details(request,id):
+    collectionRequested=get_object_or_404(Collection,id=id)
+    available_items=ArtSupply.objects.filter(collections_in=collectionRequested)
+    context = {
+        'collection':collectionRequested,
+        'available_items': available_items,
+    }
+    return render(request, 'artlibrary/collection_details.html', context)

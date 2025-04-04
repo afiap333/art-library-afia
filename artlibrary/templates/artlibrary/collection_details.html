@@ -1,0 +1,191 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Dashboard</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+        <div class="container">
+            <a class="navbar-brand" href="#">Librarian Page</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content py-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center py-4">
+                <h1 class="display-5 fw-bold text-brown">collection.title</h1>
+            </div>
+        </div>
+
+    <!-- Search Feature -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+        <form method="get" action="">
+            <div class="input-group">
+                <input type="text" name="query" class="form-control form-control-lg" placeholder="Search by title or collection..." value="{{ query }}">
+                <button type="submit" class="btn btn-brown">Search</button>
+                {% if query %}
+                <a href="{% url 'librarian_page' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Available Art Supplies -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h3 class="card-title text-brown fw-bold mb-0">
+            {% if query %}
+            Search Results for "{{ query }}"
+            {% else %}
+            Available Art Supplies
+            {% endif %}
+        </h3>
+        <div class="dropdown">
+            <button class="btn btn-outline-brown dropdown-toggle" type="button" data-bs-toggle="dropdown">Sort By</button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Newest First</a></li>
+                <li><a class="dropdown-item" href="#">Name (A-Z)</a></li>
+                <li><a class="dropdown-item" href="#">Availability</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-4">
+            {% for item in available_items %}
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 shadow-sm">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="Item Image">
+                    {% else %}
+                        <p>No image available</p>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title text-brown">{{ item.name }}</h5>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                        <p class="card-text">Quantity: {{ item.quantity }}</p>
+                        <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-brown">Borrow</a>
+                            <a href="{% url 'item_details' item.id %}" class="btn btn-outline-brown ms-2">Details</a>
+                        </div>
+                        <div class="mt-3">
+                            {% if request.user.user_role == "librarian" %}
+                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_item' item.id%}">Edit</a></button>
+                            <button type="submit" class="btn btn-danger"><a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a></button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                {% if query %}
+                <div class="alert alert-info">No matches found for "{{ query }}"</div>
+                {% else %}
+                <div class="alert alert-info">No Art Supplies Currently Available</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+    <!--Adding items pop up-->
+<!-- Modal for Adding Items -->
+
+</body>
+
+<!-- Footer -->
+<footer class="py-3 bg-dark text-white mt-auto bg-brown">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
