@@ -62,23 +62,24 @@
     <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
         <div class="container">
-            <a class="navbar-brand" href="#">Collections Page</a>
+            <a class="navbar-brand" href="#">Collections</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'redirect-login' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
                     {% if request.user.user_role == "librarian" %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                     {% endif %}
                     {% if request.user.user_role != "anonymous_user" %}
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     {% if request.user.user_role == "librarian" %}
-                    <li class="nav-item"><a class="nav-link" href="#">Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                     {% endif %}
                     {% if request.user.user_role != "anonymous_user" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
@@ -185,72 +186,6 @@
     </div>
 </div>
 </div>
-    <!--Adding items pop up
-    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addItemModalLabel">Add New Art Supply!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form add_item_form %}
-                        <button type="submit" class="btn btn-success w-100">Add Item</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>-->
-
-    <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCollectionModalLabel">Add New Collection</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        
-                        {% bootstrap_form add_collection_form %}
-
-                        <div id="privateUsersSection" class="mb-3" style="display: none;">
-                            <label for="private_users" class="form-label">Select Users with Access</label>
-                            <select id="private_users" name="users" class="form-select" multiple>
-                                {% for user in users %}
-                                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                                {% endfor %}
-                            </select>
-                            <small class="text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple users.</small>
-                        </div>
-    
-                        <button type="submit" name="add_collection" class="btn btn-success w-100">Add Collection</button> 
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        const isPublicCheckbox = document.getElementById('id_is_public'); 
-        const privateUsersSection = document.getElementById('privateUsersSection');
-
-        function togglePrivateUsersField() {
-            if (isPublicCheckbox.checked) {
-                privateUsersSection.style.display = 'none';
-            } else {
-                privateUsersSection.style.display = 'block';
-            }
-        }
-
-        togglePrivateUsersField();
-        isPublicCheckbox.addEventListener('change', togglePrivateUsersField);
-    });
-    </script>
 </body>
 
 <!-- Footer -->

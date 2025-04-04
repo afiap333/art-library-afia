@@ -59,10 +59,9 @@
 </head>
 <body class="bg-light">
 
-    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
         <div class="container">
-            <a class="navbar-brand" href="#">Collections Page</a>
+            <a class="navbar-brand" href="#">Manage users</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -70,14 +69,15 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
                     {% if request.user.user_role == "librarian" %}
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addItemModal">Add Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                     {% endif %}
                     {% if request.user.user_role != "anonymous_user" %}
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     {% if request.user.user_role == "librarian" %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                     {% endif %}
                     {% if request.user.user_role != "anonymous_user" %}

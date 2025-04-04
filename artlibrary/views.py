@@ -27,10 +27,7 @@ def store_user_role(request):
 def login_redirect(request):
     role = getattr(request.user, 'user_role', 'patron')
     user = request.user
-    print(f"User: {user}, Requested Role: {role}, Actual Role: {getattr(user, 'user_role', 'None')}")
-    if role=='librarian':
-       return redirect("librarian_page")
-    return redirect('patron_page')
+    return redirect('dashboard')
 
 @login_required
 def update_profile(request):
@@ -58,33 +55,27 @@ def update_profile(request):
 def librarian_page(request):
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
-    add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
-    add_collection_form = AddCollectionForm(request.POST or None, request.FILES or None, user=request.user) 
-    if request.method == 'POST':
-        if "add_item" in request.POST: 
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                return redirect('librarian_page')
-        elif "add_collection" in request.POST:
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('librarian_page')
-            else:
-                print(add_collection_form.errors)
     available_items = ArtSupply.objects.all()
     collections = Collection.objects.all()
     context = {
-        'add_item_form': add_item_form,
-        'add_collection_form': add_collection_form,
         'available_items': available_items,
         'collections': collections,
     }
     return render(request, 'artlibrary/librarian.html', context)
+@login_required
+def dashboard(request):
+    if request.user.user_role == 'anonymous':
+        return redirect('artlibrary')
+    if request.user.user_role == 'patron':
+        available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
+    else:
+        available_items = ArtSupply.objects.all()
+    collections = Collection.objects.all()
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+    }
+    return render(request, 'artlibrary/dashboard.html', context)
 @login_required
 def add_item(request):
     if(request.user.user_role!="librarian"):
@@ -137,17 +128,7 @@ def anonymous_page(request):
 def patron_page(request):
     available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
     messages = Message.objects.filter(recipient=request.user)
-    add_collection_form = AddCollectionForm(user=request.user)
-    if request.method == "POST":
-        if "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('patron_page')
     context = {
-        'add_collection_form': add_collection_form,
         'available_items': available_items,
         'messages': messages,
     }
@@ -176,36 +157,10 @@ def collections(request):
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
-    add_item_form = AddArtSupplyForm()
-    add_collection_form = AddCollectionForm(user=request.user)
     for collection in Collection.objects.all():
         collection.update_num_items()
-    if request.method == "POST":
-        if "add_item" in request.POST:
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                messages.success(request, "Art supply added successfully!")
-                return redirect('librarian_page')
-            else:
-                print(add_item_form.errors)
-                messages.error(request, "Please fix the errors in the form.")
-        elif "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                if (user_role == "librarian"):
-                    return redirect('librarian_page')
-                else:
-                    return redirect('patron_dashboard')
     context = {
-        'add_collection_form': add_collection_form,
         'viewable_collections': viewable_collections,
-        'add_item_form': add_item_form,
     }
     return render(request, 'artlibrary/collections.html', context)
 def update_collection(request,id):
@@ -310,7 +265,7 @@ def add_collection(request):
         'add_collection_form': form,
         'users': users
     }
-    return render(request, 'artlibrary/collections.html', context)
+    return render(request, 'artlibrary/add_collection.html', context)
 def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
@@ -382,3 +337,4 @@ def collection_details(request,id):
         'available_items': available_items,
     }
     return render(request, 'artlibrary/collection_details.html', context)
+

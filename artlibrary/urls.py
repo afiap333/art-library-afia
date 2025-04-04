@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("librarian_dashboard/", views.librarian_page, name='librarian_page'),
+    path("dashboard/", views.dashboard, name='dashboard'),
     path('', views.index, name='index'),
     path('accounts/', include('allauth.urls')),
     path('redirect-login/', views.login_redirect, name="redirect-login"),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('<int:id>/approve_collection_request/',views.approve_collection_request,name="approve_collection_request"),
     path('<int:id>/request_collection/',views.request_collection,name="request_collection"),
     path('<int:id>/collection_details/',views.collection_details,name="collection_details"),
+    path('add_collection/',views.add_collection,name="add_collection"),
 ]
