@@ -28,7 +28,9 @@ urlpatterns = [
     path('<int:id>/make_librarian/',views.make_librarian,name="make_librarian"),
     path('<int:id>/view_requests/',views.view_requests,name="view_requests"),
     path('<int:id>/approve_collection_request/',views.approve_collection_request,name="approve_collection_request"),
+    path('<int:id>/approve_item_request/',views.approve_item_request,name="approve_item_request"),
     path('<int:id>/request_collection/',views.request_collection,name="request_collection"),
     path('<int:id>/collection_details/',views.collection_details,name="collection_details"),
     path('add_collection/',views.add_collection,name="add_collection"),
+    path('<int:id>/borrow_item/',views.borrow_item,name="borrow_item"),
 ]

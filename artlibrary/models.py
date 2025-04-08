@@ -52,6 +52,7 @@ class ArtSupply(models.Model):
     item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
+    borrowed_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='borrowed_items',null=True)
     def __str__(self):
         return self.name
     
@@ -84,6 +85,7 @@ class ArtSupplyRequest(models.Model):
    librarian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="item_requests")
    timestamp=models.DateTimeField(auto_now_add=True)
    is_approved=models.BooleanField(default=False)
+   lending_period=models.TextField(null=True,blank=True)
 
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')

@@ -111,6 +111,25 @@
         </div>
         {% endfor %}
     </div>
+    <div class="container mt-4 flex-column align-items-center w-100">
+        {% for itemRequest in itemRequests %}
+        <div class="row justify-content-center w-100 mb-3">
+            <div class="col-md-6 col-lg-4 w-100">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <a href="% url 'item_details' itemRequest.item.id %"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
+                        <h5 class="text-muted">{{ itemRequest.patron.get_full_name }}</h5>
+                        {% if not itemRequest.is_approved %}
+                        <a href="{% url 'approve_item_request' itemRequest.id %}">
+                            <button class="btn btn-success">Approve Request</button>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     </div>
     
 </body>

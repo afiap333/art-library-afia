@@ -1,9 +1,9 @@
 from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest
+from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest,ArtSupplyRequest
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm,AddCollectionForm
+from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
@@ -270,7 +270,6 @@ def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
 
-    # Initialize form without POST data
     add_collection_form = AddCollectionForm(user=request.user)
 
     if request.method == "POST":
@@ -305,11 +304,13 @@ def make_librarian(request, id):
     userToUpgrade.save()
     return redirect("manage_users")
 def view_requests(request,id):
-    collectionRequests=CollectionRequest.objects.filter(librarian__id=id)
+    collectionRequests=CollectionRequest.objects.filter(librarian__id=id).filter(is_approved=False)
+    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id)
     context={
         'collectionRequests':collectionRequests,
+        'itemRequests':itemRequests,
     }
-    return render(request,'artlibrary/collection_requests.html',context)
+    return render(request,'artlibrary/view_requests.html',context)
 
 def approve_collection_request(request,id):
     collectionRequest=get_object_or_404(CollectionRequest,id=id)
@@ -319,6 +320,14 @@ def approve_collection_request(request,id):
     collectionRequest.save()
     return redirect("view_requests",id=request.user.id)
 
+def approve_item_request(request,id):
+    supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
+    supplyRequest.item.borrowed_by=supplyRequest.patron
+    supplyRequest.item.status="checked_out"
+    supplyRequest.is_approved=True
+    supplyRequest.item.save()
+    supplyRequest.save()
+    return redirect("view_requests",id=request.user.id)
 
 def request_collection(request,id):
     collectionRequested=get_object_or_404(Collection,id=id)
@@ -338,3 +347,17 @@ def collection_details(request,id):
     }
     return render(request, 'artlibrary/collection_details.html', context)
 
+def borrow_item(request,id):
+    itemToBorrow=get_object_or_404(ArtSupply,id=id)
+    borrow_form=BorrowForm()
+    if request.method == 'POST':
+        borrow_form=BorrowForm(request.POST)
+        if borrow_form.is_valid():
+            art_request = borrow_form.save(commit=False)
+            art_request.item=itemToBorrow
+            art_request.librarian=itemToBorrow.added_by
+            art_request.patron=request.user
+            art_request.save()
+            return redirect('dashboard')
+    context={"item":itemToBorrow,"borrow_form":borrow_form}
+    return render(request, 'artlibrary/borrow_item.html',context)
