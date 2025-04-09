@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest,ArtSupplyRequest
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm
+from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm,ReviewForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
@@ -269,9 +269,11 @@ def add_collection(request):
 def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
-
+    review_form=ReviewForm()
+    reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
-
+    review_exists = item.ratings.filter(user=request.user).exists()
+    print(review_exists)
     if request.method == "POST":
         if "add_to_collection" in request.POST:
             add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
@@ -281,11 +283,21 @@ def item_details(request,id):
                 for collection in selected_collections:
                     collection.items.add(item)  # Add item to each selected collection
                 return redirect('item_details', id=id)
-
+    if "submit_review" in request.POST:
+        review_form=ReviewForm(request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.item=item
+            review.user=request.user
+            review.save()
+            return redirect('item_details',id=id)
     context = {
         'add_collection_form': add_collection_form,
+        'review_form':review_form,
         'item': item,
         'collections': collections,
+        'reviews':reviews,
+        'review_exists':review_exists,
     }
     return render(request, 'artlibrary/item_details.html', context)
 def manage_users(request):
