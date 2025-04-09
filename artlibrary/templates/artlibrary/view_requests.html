@@ -93,7 +93,7 @@
         </nav>
         
     <div class="container mt-4 flex-column align-items-center w-100">
-        <h1>Collection Requests</h1>
+        <h3>Collection Requests</h3>
         {% for collectionRequest in collectionRequests %}
         <div class="row justify-content-center w-100 mb-3">
             <div class="col-md-6 col-lg-4 w-100">
@@ -110,9 +110,14 @@
                 </div>
             </div>
         </div>
-        {% endfor %}
+        {% empty %}
+            <div class="col-12">
+                <p class="text-muted">No collection requests currently.</p>
+            </div>
+            {% endfor %}
     </div>
     <div class="container mt-4 flex-column align-items-center w-100">
+        <h3>Borrow Requests</h3>
         {% for itemRequest in itemRequests %}
         <div class="row justify-content-center w-100 mb-3">
             <div class="col-md-6 col-lg-4 w-100">
@@ -144,10 +149,15 @@
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-muted">No borrow requests currently.</p>
+        </div>
         {% endfor %}
     </div>
     </div>
     <div class="card-body p-4">
+        <h3>Borrowed Items</h3>
         <div class="row g-4">
             {% for item in borrowedItems %}
             <div class="col-md-4 col-sm-6">
@@ -160,7 +170,6 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="card-title text-brown">{{ item.name }}</h5>
-                            <span class="badge bg-success">Available</span>
                         </div>
                         <p class="card-text">Quantity: {{ item.quantity }}</p>
                         <div class="mt-3">
@@ -170,6 +179,9 @@
                 </div>
             </div>
             {% empty %}
+            <div class="col-12">
+                <p class="text-muted">No borrowed items currently.</p>
+            </div>
             {% endfor %}
         </div>
     </div>
