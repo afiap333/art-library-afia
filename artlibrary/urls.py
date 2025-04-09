@@ -33,4 +33,5 @@ urlpatterns = [
     path('<int:id>/collection_details/',views.collection_details,name="collection_details"),
     path('add_collection/',views.add_collection,name="add_collection"),
     path('<int:id>/borrow_item/',views.borrow_item,name="borrow_item"),
+    path('<int:id>/mark_as_returned/',views.return_item,name="mark_as_returned"),
 ]

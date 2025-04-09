@@ -13,7 +13,7 @@ class LibrarianAuthentication(TestCase):
     def test_librarian_access(self):
         self.client.force_login(self.user)
         response=self.client.get(reverse("redirect-login"))
-        self.assertRedirects(response,reverse("librarian_page"))
+        self.assertRedirects(response,reverse("dashboard"))
 class AnonymousUserRedirect(TestCase):
     def setUp(self):
         self.client=Client()
@@ -28,7 +28,7 @@ class PatronRedirect(TestCase):
     def test_patron_access(self):
         self.client.force_login(self.user)
         response=self.client.get(reverse("redirect-login"))
-        self.assertRedirects(response,reverse("patron_page")) 
+        self.assertRedirects(response,reverse("dashboard")) 
 class defaultPatron(TestCase):
     def setUp(self):
         self.client=Client()
@@ -36,4 +36,4 @@ class defaultPatron(TestCase):
     def test_patron_access(self):
         self.client.force_login(self.user)
         response=self.client.get(reverse("redirect-login"))
-        self.assertRedirects(response,reverse("patron_page")) 
+        self.assertRedirects(response,reverse("dashboard")) 
