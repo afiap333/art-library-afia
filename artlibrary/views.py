@@ -333,6 +333,13 @@ def approve_collection_request(request,id):
     collectionRequest.collection.save()
     collectionRequest.is_approved=True
     collectionRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=collectionRequest.patron.email
+    email_subject="Borrow approved for"+collectionRequest.collection.title
+    email_message="Your request to borrow the item "+collectionRequest.collection.title+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     return redirect("view_requests",id=request.user.id)
 
 def approve_item_request(request,id):
@@ -342,6 +349,13 @@ def approve_item_request(request,id):
     supplyRequest.is_approved=True
     supplyRequest.item.save()
     supplyRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=supplyRequest.patron.email
+    email_subject="Borrow approved for"+supplyRequest.item.name
+    email_message="Your request to borrow the item "+supplyRequest.item.name+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     return redirect("view_requests",id=request.user.id)
 
 def request_collection(request,id):
@@ -353,7 +367,7 @@ def request_collection(request,id):
     requestEmail="artlibrary2025@gmail.com"
     recepientEmail=requestedCollection.librarian.email
     email_subject="New access request for "+collectionRequested.title
-    email_message=requestedCollection.patron.get_full_name()+"requested access to your collection! Go to the Art Supply library to approve now"
+    email_message=requestedCollection.patron.get_full_name()+" requested access to your collection! Go to the Art Supply library to approve now."
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
@@ -381,6 +395,13 @@ def borrow_item(request,id):
             art_request.patron=request.user
             art_request.save()
             return redirect('dashboard')
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=itemToBorrow.added_by.email
+    email_subject="New access request for "+itemToBorrow.name
+    email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     context={"item":itemToBorrow,"borrow_form":borrow_form}
     return render(request, 'artlibrary/borrow_item.html',context)
 
