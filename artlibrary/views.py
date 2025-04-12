@@ -216,8 +216,17 @@ def collections(request):
         viewable_collections = Collection.objects.all()
     for collection in Collection.objects.all():
         collection.update_num_items()
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        viewable_collections = viewable_collections.filter(title__icontains=query)
+
     context = {
         'viewable_collections': viewable_collections,
+        'query': query,
     }
     return render(request, 'artlibrary/collections.html', context)
 def update_collection(request,id):
@@ -436,6 +445,20 @@ def collection_details(request,id):
     context = {
         'collection':collectionRequested,
         'available_items': available_items,
+    }
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+        'collectionRequested': collectionRequested,
     }
     return render(request, 'artlibrary/collection_details.html', context)
 
