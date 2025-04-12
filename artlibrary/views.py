@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Q
 from .forms import ProfileForm
 from django.contrib import messages
+from django.core.mail import send_mail
 
 
 def index(request):
@@ -364,6 +365,13 @@ def approve_collection_request(request,id):
     collectionRequest.collection.save()
     collectionRequest.is_approved=True
     collectionRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=collectionRequest.patron.email
+    email_subject="Borrow approved for"+collectionRequest.collection.title
+    email_message="Your request to borrow the item "+collectionRequest.collection.title+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     return redirect("view_requests",id=request.user.id)
 
 def approve_item_request(request,id):
@@ -373,6 +381,13 @@ def approve_item_request(request,id):
     supplyRequest.is_approved=True
     supplyRequest.item.save()
     supplyRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=supplyRequest.patron.email
+    email_subject="Borrow approved for"+supplyRequest.item.name
+    email_message="Your request to borrow the item "+supplyRequest.item.name+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     return redirect("view_requests",id=request.user.id)
 
 def request_collection(request,id):
@@ -380,8 +395,15 @@ def request_collection(request,id):
     existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
     if existing_request:
         return redirect("collections")
-    request=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
-    messages.success("Your request has been submitted successfully!")
+    requestedCollection=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=requestedCollection.librarian.email
+    email_subject="New access request for "+collectionRequested.title
+    email_message=requestedCollection.patron.get_full_name()+" requested access to your collection! Go to the Art Supply library to approve now."
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    messages.success(request, "Your request has been submitted successfully!")
     return redirect("collections")
 
 def collection_details(request,id):
@@ -405,6 +427,13 @@ def borrow_item(request,id):
             art_request.patron=request.user
             art_request.save()
             return redirect('dashboard')
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=itemToBorrow.added_by.email
+    email_subject="New access request for "+itemToBorrow.name
+    email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
     context={"item":itemToBorrow,"borrow_form":borrow_form}
     return render(request, 'artlibrary/borrow_item.html',context)
 
