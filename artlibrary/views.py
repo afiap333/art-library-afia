@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Q
 from .forms import ProfileForm
 from django.contrib import messages
+from django.core.mail import send_mail
 
 
 def index(request):
@@ -348,8 +349,15 @@ def request_collection(request,id):
     existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
     if existing_request:
         return redirect("collections")
-    request=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
-    messages.success("Your request has been submitted successfully!")
+    requestedCollection=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=requestedCollection.librarian.email
+    email_subject="New access request for "+collectionRequested.title
+    email_message=requestedCollection.patron.get_full_name()+"requested access to your collection! Go to the Art Supply library to approve now"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    messages.success(request, "Your request has been submitted successfully!")
     return redirect("collections")
 
 def collection_details(request,id):
