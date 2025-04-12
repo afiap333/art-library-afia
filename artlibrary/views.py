@@ -76,6 +76,29 @@ def librarian_page(request):
     return render(request, 'artlibrary/librarian.html', context)
 
 @login_required
+def librarian_page(request):
+    query = request.GET.get('query', '')
+
+    if request.user.user_role == 'anonymous':
+        return redirect('artlibrary')
+    
+    available_items = ArtSupply.objects.all()
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
+    collections = Collection.objects.all()
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/librarian.html', context)
+
+@login_required
 def dashboard(request):
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
@@ -99,6 +122,7 @@ def dashboard(request):
         'query': query,
     }
     return render(request, 'artlibrary/dashboard.html', context)
+
 @login_required
 def add_item(request):
     if(request.user.user_role!="librarian"):
