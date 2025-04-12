@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Librarian Dashboard</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <style>
@@ -58,11 +58,9 @@
     </style>
 </head>
 <body class="bg-light">
-
-    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
         <div class="container">
-            <a class="navbar-brand" href="#">{{user.user_role}} Page</a>
+            <a class="navbar-brand" href="#">Collection details</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -76,7 +74,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
@@ -90,13 +88,12 @@
                 </ul>
             </div>
         </div>
-    </nav>
+        </nav>
 
     <div class="container main-content py-4">
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body text-center py-4">
-                <h1 class="display-5 fw-bold text-brown">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
-                <p class="lead">Borrow and lend art supplies for your projects!</p>
+                <h1 class="display-5 fw-bold text-brown">Borrowed Items</h1>
             </div>
         </div>
 
@@ -115,7 +112,7 @@
     </div>
 </div>
 
-<!-- Available Art Supplies -->
+<!-- Borrowed Art Supplies -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
         <h3 class="card-title text-brown fw-bold mb-0">
@@ -152,7 +149,7 @@
                         <p class="card-text">Quantity: {{ item.quantity }}</p>
                         <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
                         <div class="mt-3">
-                            <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
+                            <a href="#" class="btn btn-brown">Borrow</a>
                             <a href="{% url 'item_details' item.id %}" class="btn btn-outline-brown ms-2">Details</a>
                         </div>
                         <div class="mt-3">
@@ -178,6 +175,8 @@
 </div>
 </div>
     <!--Adding items pop up-->
+<!-- Modal for Adding Items -->
+
 </body>
 
 <!-- Footer -->

@@ -490,3 +490,22 @@ def return_item(request,id):
     itemToReturn.status="available"
     itemToReturn.save()
     return redirect("view_requests",id=request.user.id)
+
+def borrowed_items(request):
+    available_items = ArtSupply.objects.filter(borrowed_by=request.user)
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
+    collections = Collection.objects.all()
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/borrowed_items.html', context)
