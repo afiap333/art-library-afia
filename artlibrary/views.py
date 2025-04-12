@@ -53,15 +53,27 @@ def update_profile(request):
 
 @login_required
 def librarian_page(request):
+    query = request.GET.get('query', '')
+
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
+    
     available_items = ArtSupply.objects.all()
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
     collections = Collection.objects.all()
+
     context = {
         'available_items': available_items,
         'collections': collections,
+        'query': query,
     }
     return render(request, 'artlibrary/librarian.html', context)
+
 @login_required
 def dashboard(request):
     if request.user.user_role == 'anonymous':
@@ -70,10 +82,20 @@ def dashboard(request):
         available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
     else:
         available_items = ArtSupply.objects.all()
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
     collections = Collection.objects.all()
+
     context = {
         'available_items': available_items,
         'collections': collections,
+        'query': query,
     }
     return render(request, 'artlibrary/dashboard.html', context)
 @login_required
@@ -125,14 +147,24 @@ def anonymous_page(request):
     return render(request, 'artlibrary/anonymous.html', context)
 
 @login_required
+
 def patron_page(request):
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
-    messages = Message.objects.filter(recipient=request.user)
-    context = {
-        'available_items': available_items,
-        'messages': messages,
-    }
-    return render(request, 'artlibrary/patron.html', context)
+     query = request.GET.get('query', '')
+ 
+     if query:
+         available_items = ArtSupply.objects.filter(name__icontains=query)
+     else:
+         available_items = ArtSupply.objects.all()
+     
+     messages = Message.objects.filter(recipient=request.user)
+ 
+     context = {
+         'available_items': available_items,
+         'messages': messages,
+         'query': query,
+     }
+     return render(request, 'artlibrary/patron.html', context)
+
 def profile(request):
     return render(request,'artlibrary/userprofile.html')
 
