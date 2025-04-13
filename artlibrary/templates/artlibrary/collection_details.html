@@ -58,11 +58,9 @@
     </style>
 </head>
 <body class="bg-light">
-
-    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
         <div class="container">
-            <a class="navbar-brand" href="#">Librarian Page</a>
+            <a class="navbar-brand" href="#">Collection details</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -90,13 +88,12 @@
                 </ul>
             </div>
         </div>
-    </nav>
+        </nav>
 
     <div class="container main-content py-4">
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body text-center py-4">
-                <h1 class="display-5 fw-bold text-brown">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
-                <p class="lead">Borrow and lend art supplies for your projects!</p>
+                <h1 class="display-5 fw-bold text-brown">collection.title</h1>
             </div>
         </div>
 
@@ -178,6 +175,8 @@
 </div>
 </div>
     <!--Adding items pop up-->
+<!-- Modal for Adding Items -->
+
 </body>
 
 <!-- Footer -->

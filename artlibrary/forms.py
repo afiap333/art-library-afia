@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import ArtSupply,Collection
+from .models import ArtSupply,Collection,ArtSupplyRequest,Reviews
 from .models import CustomUser
 
 class AddArtSupplyForm(forms.ModelForm):
@@ -57,3 +57,30 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['profile_pic','user_role']
+
+class BorrowForm(forms.ModelForm):
+    class Meta:
+        model = ArtSupplyRequest
+        fields = ['lending_period']
+        widgets = {
+            'lending_period': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+class ReviewForm(forms.ModelForm):
+    ratings = [
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    ]
+    rating = forms.ChoiceField(
+        choices=ratings,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    class Meta:
+        model=Reviews
+        fields=['rating','comment']
+        widgets={
+            'comment':forms.TextInput(attrs={'class':'form-control'}),
+        }

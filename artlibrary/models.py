@@ -52,6 +52,7 @@ class ArtSupply(models.Model):
     item_type=models.CharField(max_length=7,choices=USE_TYPE,default='multi')
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
+    borrowed_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='borrowed_items',null=True)
     def __str__(self):
         return self.name
     
@@ -70,6 +71,21 @@ class Collection(models.Model):
     def update_num_items(self):
         self.num_items = self.art_supplies.count()
         self.save()
+
+class CollectionRequest(models.Model):
+   collection=models.ForeignKey(Collection,on_delete=models.CASCADE,related_name="requests_for_collection",default=None)
+   patron = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="requested_collections")
+   librarian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="collection_requests")
+   timestamp=models.DateTimeField(auto_now_add=True)
+   is_approved=models.BooleanField(default=False)
+
+class ArtSupplyRequest(models.Model):
+   item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name="requests_for_item",default=None)
+   patron = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="requested_items")
+   librarian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="item_requests")
+   timestamp=models.DateTimeField(auto_now_add=True)
+   is_approved=models.BooleanField(default=False)
+   lending_period=models.TextField(null=True,blank=True)
 
 class Reviews(models.Model):
     item=models.ForeignKey(ArtSupply,on_delete=models.CASCADE,related_name='ratings')

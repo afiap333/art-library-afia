@@ -1,9 +1,9 @@
 from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser,Collection
+from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest,ArtSupplyRequest
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AddArtSupplyForm,AddCollectionForm
+from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm,ReviewForm
 from django.contrib.auth import logout
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Q
 from .forms import ProfileForm
 from django.contrib import messages
+from django.core.mail import send_mail
 
 
 def index(request):
@@ -27,10 +28,7 @@ def store_user_role(request):
 def login_redirect(request):
     role = getattr(request.user, 'user_role', 'patron')
     user = request.user
-    print(f"User: {user}, Requested Role: {role}, Actual Role: {getattr(user, 'user_role', 'None')}")
-    if role=='librarian':
-       return redirect("librarian_page")
-    return redirect('patron_page')
+    return redirect('dashboard')
 
 @login_required
 def update_profile(request):
@@ -58,33 +56,27 @@ def update_profile(request):
 def librarian_page(request):
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
-    add_item_form = AddArtSupplyForm(request.POST or None, request.FILES or None)
-    add_collection_form = AddCollectionForm(request.POST or None, request.FILES or None, user=request.user) 
-    if request.method == 'POST':
-        if "add_item" in request.POST: 
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                return redirect('librarian_page')
-        elif "add_collection" in request.POST:
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('librarian_page')
-            else:
-                print(add_collection_form.errors)
     available_items = ArtSupply.objects.all()
     collections = Collection.objects.all()
     context = {
-        'add_item_form': add_item_form,
-        'add_collection_form': add_collection_form,
         'available_items': available_items,
         'collections': collections,
     }
     return render(request, 'artlibrary/librarian.html', context)
+@login_required
+def dashboard(request):
+    if request.user.user_role == 'anonymous':
+        return redirect('artlibrary')
+    if request.user.user_role == 'patron':
+        available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+    else:
+        available_items = ArtSupply.objects.all()
+    collections = Collection.objects.all()
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+    }
+    return render(request, 'artlibrary/dashboard.html', context)
 @login_required
 def add_item(request):
     if(request.user.user_role!="librarian"):
@@ -126,7 +118,7 @@ def anonymous_page(request):
         user=request.user
     else:
         user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
     context = {
         'user':user,
         'available_items': available_items,
@@ -135,19 +127,9 @@ def anonymous_page(request):
 
 @login_required
 def patron_page(request):
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True))
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
     messages = Message.objects.filter(recipient=request.user)
-    add_collection_form = AddCollectionForm(user=request.user)
-    if request.method == "POST":
-        if "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES,user=request.user)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                return redirect('patron_page')
     context = {
-        'add_collection_form': add_collection_form,
         'available_items': available_items,
         'messages': messages,
     }
@@ -176,36 +158,10 @@ def collections(request):
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
-    add_item_form = AddArtSupplyForm()
-    add_collection_form = AddCollectionForm(user=request.user)
     for collection in Collection.objects.all():
         collection.update_num_items()
-    if request.method == "POST":
-        if "add_item" in request.POST:
-            add_item_form = AddArtSupplyForm(request.POST, request.FILES)
-            if add_item_form.is_valid():
-                artSupply = add_item_form.save(commit=False)
-                artSupply.added_by = request.user
-                artSupply.save()
-                messages.success(request, "Art supply added successfully!")
-                return redirect('librarian_page')
-            else:
-                print(add_item_form.errors)
-                messages.error(request, "Please fix the errors in the form.")
-        elif "add_collection" in request.POST:
-            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
-            if add_collection_form.is_valid():
-                collection = add_collection_form.save(commit=False)
-                collection.added_by = request.user
-                collection.save()
-                if (user_role == "librarian"):
-                    return redirect('librarian_page')
-                else:
-                    return redirect('patron_dashboard')
     context = {
-        'add_collection_form': add_collection_form,
         'viewable_collections': viewable_collections,
-        'add_item_form': add_item_form,
     }
     return render(request, 'artlibrary/collections.html', context)
 def update_collection(request,id):
@@ -310,14 +266,15 @@ def add_collection(request):
         'add_collection_form': form,
         'users': users
     }
-    return render(request, 'artlibrary/collections.html', context)
+    return render(request, 'artlibrary/add_collection.html', context)
 def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
-
-    # Initialize form without POST data
+    review_form=ReviewForm()
+    reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
-
+    review_exists = item.ratings.filter(user=request.user).exists()
+    print(review_exists)
     if request.method == "POST":
         if "add_to_collection" in request.POST:
             add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
@@ -327,10 +284,130 @@ def item_details(request,id):
                 for collection in selected_collections:
                     collection.items.add(item)  # Add item to each selected collection
                 return redirect('item_details', id=id)
-
+    if "submit_review" in request.POST:
+        review_form=ReviewForm(request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.item=item
+            review.user=request.user
+            review.save()
+            return redirect('item_details',id=id)
     context = {
         'add_collection_form': add_collection_form,
+        'review_form':review_form,
         'item': item,
         'collections': collections,
+        'reviews':reviews,
+        'review_exists':review_exists,
     }
     return render(request, 'artlibrary/item_details.html', context)
+def manage_users(request):
+    if(request.user.user_role!="librarian"):
+        if request.user.user_role=="anonymous":
+            return redirect("anonymous_page")
+        else:
+            return redirect("patron_page")
+    usersList= CustomUser.objects.all()
+    context={'all_users':usersList}
+    return render(request,'artlibrary/manage_users.html',context)
+    
+def make_librarian(request, id):
+    userToUpgrade=get_object_or_404(CustomUser, id=id)
+    userToUpgrade.user_role="librarian"
+    userToUpgrade.save()
+    return redirect("manage_users")
+def view_requests(request,id):
+    collectionRequests=CollectionRequest.objects.filter(librarian__id=id).filter(is_approved=False)
+    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False)
+    borrowedItems=ArtSupply.objects.filter(added_by=id).filter(status="checked_out")
+    context={
+        'collectionRequests':collectionRequests,
+        'itemRequests':itemRequests,
+        'borrowedItems':borrowedItems,
+    }
+    return render(request,'artlibrary/view_requests.html',context)
+
+def approve_collection_request(request,id):
+    collectionRequest=get_object_or_404(CollectionRequest,id=id)
+    collectionRequest.collection.users.add(collectionRequest.patron)
+    collectionRequest.collection.save()
+    collectionRequest.is_approved=True
+    collectionRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=collectionRequest.patron.email
+    email_subject="Borrow approved for"+collectionRequest.collection.title
+    email_message="Your request to borrow the item "+collectionRequest.collection.title+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    return redirect("view_requests",id=request.user.id)
+
+def approve_item_request(request,id):
+    supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
+    supplyRequest.item.borrowed_by=supplyRequest.patron
+    supplyRequest.item.status="checked_out"
+    supplyRequest.is_approved=True
+    supplyRequest.item.save()
+    supplyRequest.save()
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=supplyRequest.patron.email
+    email_subject="Borrow approved for"+supplyRequest.item.name
+    email_message="Your request to borrow the item "+supplyRequest.item.name+" has been approved!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    return redirect("view_requests",id=request.user.id)
+
+def request_collection(request,id):
+    collectionRequested=get_object_or_404(Collection,id=id)
+    existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
+    if existing_request:
+        return redirect("collections")
+    requestedCollection=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=requestedCollection.librarian.email
+    email_subject="New access request for "+collectionRequested.title
+    email_message=requestedCollection.patron.get_full_name()+" requested access to your collection! Go to the Art Supply library to approve now."
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    messages.success(request, "Your request has been submitted successfully!")
+    return redirect("collections")
+
+def collection_details(request,id):
+    collectionRequested=get_object_or_404(Collection,id=id)
+    available_items=ArtSupply.objects.filter(collections_in=collectionRequested).filter(status="available")
+    context = {
+        'collection':collectionRequested,
+        'available_items': available_items,
+    }
+    return render(request, 'artlibrary/collection_details.html', context)
+
+def borrow_item(request,id):
+    itemToBorrow=get_object_or_404(ArtSupply,id=id)
+    borrow_form=BorrowForm()
+    if request.method == 'POST':
+        borrow_form=BorrowForm(request.POST)
+        if borrow_form.is_valid():
+            art_request = borrow_form.save(commit=False)
+            art_request.item=itemToBorrow
+            art_request.librarian=itemToBorrow.added_by
+            art_request.patron=request.user
+            art_request.save()
+            return redirect('dashboard')
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=itemToBorrow.added_by.email
+    email_subject="New access request for "+itemToBorrow.name
+    email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    context={"item":itemToBorrow,"borrow_form":borrow_form}
+    return render(request, 'artlibrary/borrow_item.html',context)
+
+def return_item(request,id):
+    itemToReturn=get_object_or_404(ArtSupply,id=id)
+    itemToReturn.borrowed_by=None
+    itemToReturn.status="available"
+    itemToReturn.save()
+    return redirect("view_requests",id=request.user.id)

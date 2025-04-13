@@ -57,21 +57,30 @@
         }
     </style>
 </head>
-<body class="bg-light">
-
-   <!-- Navigation Bar -->
-   <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+<nav class="navbar navbar-expand-lg navbar-dark bg-brown">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">Profile Page</a>
+        <a class="navbar-brand" href="#">User profile</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active" href="{% url 'redirect-login' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'redirect-login' %}">Borrow</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
+                {% endif %}
+                {% if request.user.user_role != "anonymous_user" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
+                {% endif %}
+                {% if request.user.user_role != "anonymous_user" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
                 </li>
@@ -79,6 +88,7 @@
         </div>
     </div>
 </nav>
+<body class="bg-light">
 
    <!-- ✅ User Profile Section -->
    <div class="container mt-5">

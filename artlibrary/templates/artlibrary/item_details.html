@@ -57,30 +57,38 @@
         }
     </style>
 </head>
-<body class="bg-light">
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">View Item</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Borrow</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">My Borrowed Items</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Add Collection</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+    <div class="container">
+        <a class="navbar-brand" href="#">Item details</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
+                {% endif %}
+                {% if request.user.user_role != "anonymous_user" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
+                {% endif %}
+                {% if request.user.user_role != "anonymous_user" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+<body class="bg-light">
 
    
     <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
@@ -120,6 +128,34 @@
                             <p class="card-text"><small class="text-muted">Description: {{ item.description}}</small></p>
                             <p class="card-text"><small class="text-muted">Use type: {{ item.item_type}}</small></p>
             </div>
+        </div>
+        <div class="container mt-4">
+            <h2>Review Item</h2>
+            {% if not review.exists %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{review_form.as_p }}
+                <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
+            </form>
+            {% else %}
+            <p>You already reviewed the item!</p>
+            {% endif %}
+        </div>
+        <div class="container mt-4">
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title">Review by {{ review.user }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Rating: {{ review.rating }}/5</h6>
+                        <p class="card-text">{{ review.comment }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No reviews yet.</p>
+            {% endfor %}
         </div>
     </div>
 </div>
