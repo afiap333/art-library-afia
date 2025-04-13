@@ -383,7 +383,7 @@ def make_librarian(request, id):
     return redirect("manage_users")
 def view_requests(request,id):
     collectionRequests=CollectionRequest.objects.filter(librarian__id=id).filter(is_approved=False)
-    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False)
+    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False).filter(item__status="available")
     borrowedItems=ArtSupply.objects.filter(added_by=id).filter(status="checked_out")
     context={
         'collectionRequests':collectionRequests,
@@ -400,8 +400,8 @@ def approve_collection_request(request,id):
     collectionRequest.save()
     requestEmail="artlibrary2025@gmail.com"
     recepientEmail=collectionRequest.patron.email
-    email_subject="Borrow approved for"+collectionRequest.collection.title
-    email_message="Your request to borrow the item "+collectionRequest.collection.title+" has been approved!"
+    email_subject="View request approved for"+collectionRequest.collection.title
+    email_message="Your request to view the collection "+collectionRequest.collection.title+" has been approved!"
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
@@ -476,7 +476,7 @@ def borrow_item(request,id):
             return redirect('dashboard')
     requestEmail="artlibrary2025@gmail.com"
     recepientEmail=itemToBorrow.added_by.email
-    email_subject="New access request for "+itemToBorrow.name
+    email_subject="New borrow request for "+itemToBorrow.name
     email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
