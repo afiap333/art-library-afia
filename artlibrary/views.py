@@ -54,15 +54,50 @@ def update_profile(request):
 
 @login_required
 def librarian_page(request):
+    query = request.GET.get('query', '')
+
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
+    
     available_items = ArtSupply.objects.all()
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
     collections = Collection.objects.all()
+
     context = {
         'available_items': available_items,
         'collections': collections,
+        'query': query,
     }
     return render(request, 'artlibrary/librarian.html', context)
+
+@login_required
+def librarian_page(request):
+    query = request.GET.get('query', '')
+
+    if request.user.user_role == 'anonymous':
+        return redirect('artlibrary')
+    
+    available_items = ArtSupply.objects.all()
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
+    collections = Collection.objects.all()
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/librarian.html', context)
+
 @login_required
 def dashboard(request):
     if request.user.user_role == 'anonymous':
@@ -71,12 +106,23 @@ def dashboard(request):
         available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
     else:
         available_items = ArtSupply.objects.all()
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
     collections = Collection.objects.all()
+
     context = {
         'available_items': available_items,
         'collections': collections,
+        'query': query,
     }
     return render(request, 'artlibrary/dashboard.html', context)
+
 @login_required
 def add_item(request):
     if(request.user.user_role!="librarian"):
@@ -126,14 +172,24 @@ def anonymous_page(request):
     return render(request, 'artlibrary/anonymous.html', context)
 
 @login_required
+
 def patron_page(request):
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
-    messages = Message.objects.filter(recipient=request.user)
-    context = {
-        'available_items': available_items,
-        'messages': messages,
-    }
-    return render(request, 'artlibrary/patron.html', context)
+     query = request.GET.get('query', '')
+ 
+     if query:
+         available_items = ArtSupply.objects.filter(name__icontains=query)
+     else:
+         available_items = ArtSupply.objects.all()
+     
+     messages = Message.objects.filter(recipient=request.user)
+ 
+     context = {
+         'available_items': available_items,
+         'messages': messages,
+         'query': query,
+     }
+     return render(request, 'artlibrary/patron.html', context)
+
 def profile(request):
     return render(request,'artlibrary/userprofile.html')
 
@@ -160,8 +216,17 @@ def collections(request):
         viewable_collections = Collection.objects.all()
     for collection in Collection.objects.all():
         collection.update_num_items()
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        viewable_collections = viewable_collections.filter(title__icontains=query)
+
     context = {
         'viewable_collections': viewable_collections,
+        'query': query,
     }
     return render(request, 'artlibrary/collections.html', context)
 def update_collection(request,id):
@@ -318,7 +383,7 @@ def make_librarian(request, id):
     return redirect("manage_users")
 def view_requests(request,id):
     collectionRequests=CollectionRequest.objects.filter(librarian__id=id).filter(is_approved=False)
-    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False)
+    itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False).filter(item__status="available")
     borrowedItems=ArtSupply.objects.filter(added_by=id).filter(status="checked_out")
     context={
         'collectionRequests':collectionRequests,
@@ -335,8 +400,8 @@ def approve_collection_request(request,id):
     collectionRequest.save()
     requestEmail="artlibrary2025@gmail.com"
     recepientEmail=collectionRequest.patron.email
-    email_subject="Borrow approved for"+collectionRequest.collection.title
-    email_message="Your request to borrow the item "+collectionRequest.collection.title+" has been approved!"
+    email_subject="View request approved for"+collectionRequest.collection.title
+    email_message="Your request to view the collection "+collectionRequest.collection.title+" has been approved!"
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
@@ -381,6 +446,20 @@ def collection_details(request,id):
         'collection':collectionRequested,
         'available_items': available_items,
     }
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+        'collectionRequested': collectionRequested,
+    }
     return render(request, 'artlibrary/collection_details.html', context)
 
 def borrow_item(request,id):
@@ -397,7 +476,7 @@ def borrow_item(request,id):
             return redirect('dashboard')
     requestEmail="artlibrary2025@gmail.com"
     recepientEmail=itemToBorrow.added_by.email
-    email_subject="New access request for "+itemToBorrow.name
+    email_subject="New borrow request for "+itemToBorrow.name
     email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
@@ -411,3 +490,22 @@ def return_item(request,id):
     itemToReturn.status="available"
     itemToReturn.save()
     return redirect("view_requests",id=request.user.id)
+
+def borrowed_items(request):
+    available_items = ArtSupply.objects.filter(borrowed_by=request.user)
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+    
+    collections = Collection.objects.all()
+
+    context = {
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/borrowed_items.html', context)
