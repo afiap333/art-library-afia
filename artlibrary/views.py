@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm,ReviewForm
 from django.contrib.auth import logout
+from django.contrib.auth.models import AnonymousUser
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter as BaseGoogleOAuth2Adapter
 from django.db import models
@@ -335,6 +336,16 @@ def add_collection(request):
 def item_details(request,id):
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
+    reviews=item.ratings.all()
+    if isinstance(request.user, AnonymousUser):
+        context = {
+        'item': item,
+        'collections': collections,
+        'reviews':reviews,
+        }
+        return render(request, 'artlibrary/item_details.html', context)
+    item = get_object_or_404(ArtSupply, id=id)
+    collections = Collection.objects.all()
     review_form=ReviewForm()
     reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
@@ -365,6 +376,12 @@ def item_details(request,id):
         'reviews':reviews,
         'review_exists':review_exists,
     }
+    if(request.user.user_role=="anonymous"):
+        context = {
+        'item': item,
+        'collections': collections,
+        'reviews':reviews,
+        }
     return render(request, 'artlibrary/item_details.html', context)
 def manage_users(request):
     if(request.user.user_role!="librarian"):

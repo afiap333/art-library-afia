@@ -65,7 +65,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                {% if not request.user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
+                {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+                {% endif %}
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                 {% endif %}
@@ -90,29 +94,6 @@
 </nav>
 <body class="bg-light">
 
-   
-    <div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCollectionModalLabel">{{item.name}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <h5>Select Collections to Add Item</h5>
-                        <select name="collections" multiple class="form-control mb-3">
-                            {% for collection in collections %}
-                                <option value="{{ collection.id }}">{{ collection.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" name="add_to_collection" class="btn btn-success w-100">Add to Collection</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Available Art Supplies -->
         <div class="container">
@@ -123,23 +104,27 @@
                                 <span class="badge bg-success">Available</span>
                             </div>
                             <h6>Quantity</h6> <p>{{ item.quantity }}</p>
-                            <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
-                            <p class="card-text"><small class="text-muted">Use policy: {{ item.use_policy}}</small></p>
-                            <p class="card-text"><small class="text-muted">Description: {{ item.description}}</small></p>
-                            <p class="card-text"><small class="text-muted">Use type: {{ item.item_type}}</small></p>
+                            <p class="card-text">Pickup at: {{ item.pickup_location }}</p>
+                            <p class="card-text">Use policy: {{ item.use_policy}}</p>
+                            <p class="card-text">Description: {{ item.description}}</p>
+                            <p class="card-text">Use type: {{ item.item_type}}-use</p>
             </div>
         </div>
         <div class="container mt-4">
             <h2>Review Item</h2>
-            {% if not review.exists %}
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{review_form.as_p }}
-                <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
-            </form>
-            {% else %}
+            {% if request.user.is_authenticated %}
+            {% if review_exists %}
             <p>You already reviewed the item!</p>
+            {% else %}
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ review_form.as_p }}
+                    <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
+                </form>
             {% endif %}
+        {% else %}
+            <p>You must login to review an item</p>
+        {% endif %}
         </div>
         <div class="container mt-4">
             <h3>Reviews</h3>
