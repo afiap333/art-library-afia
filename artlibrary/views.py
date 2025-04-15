@@ -232,14 +232,24 @@ def collections(request):
     return render(request, 'artlibrary/collections.html', context)
 def update_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
-    if request.method=='POST':
+    itemsInCollection=collection.art_supplies.all()
+    not_in_collection = ArtSupply.objects.exclude(collections_in=collection).filter( Q(collections_in__is_public=True) | Q(collections_in__isnull=True))
+    if request.method=='POST' and "edit_collection" in request.POST:
         form=AddCollectionForm(request.POST,instance=collection,user=request.user)
         if form.is_valid():
             form.save()
             return redirect('collections')
     else:
         form=AddCollectionForm(instance=collection,user=request.user)
-    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form})
+    if request.method=='POST' and "add_item" in request.POST:
+        item_id = request.POST.get('item_id')
+        collection.art_supplies.add(get_object_or_404(ArtSupply,id=item_id))
+        collection.save()
+    if request.method=='POST' and "remove_item" in request.POST:
+        item_id = request.POST.get('item_id')
+        collection.art_supplies.remove(get_object_or_404(ArtSupply,id=item_id))
+        collection.save()
+    return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form,"itemsInCollection":itemsInCollection,"not_in_collection":not_in_collection})
 
 def delete_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
@@ -338,7 +348,6 @@ def item_details(request,id):
     reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
     review_exists = item.ratings.filter(user=request.user).exists()
-    print(review_exists)
     if request.method == "POST":
         if "add_to_collection" in request.POST:
             add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
@@ -411,6 +420,17 @@ def approve_collection_request(request,id):
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
     return redirect("view_requests",id=request.user.id)
+def deny_collection_request(request,id):
+    collectionRequest=get_object_or_404(CollectionRequest,id=id)
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=collectionRequest.patron.email
+    email_subject="View request denied for"+collectionRequest.collection.title
+    email_message="Your request to view the collection "+collectionRequest.collection.title+" has been denied!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    collectionRequest.delete()
+    return redirect("view_requests",id=request.user.id)
 
 def approve_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
@@ -426,6 +446,18 @@ def approve_item_request(request,id):
     send_mail(
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
+    return redirect("view_requests",id=request.user.id)
+
+def deny_item_request(request,id):
+    supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
+    requestEmail="artlibrary2025@gmail.com"
+    recepientEmail=supplyRequest.patron.email
+    email_subject="Borrow denied for"+supplyRequest.item.name
+    email_message="Your request to borrow the item "+supplyRequest.item.name+" has been denied!"
+    send_mail(
+        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+    )
+    supplyRequest.delete()
     return redirect("view_requests",id=request.user.id)
 
 def request_collection(request,id):
