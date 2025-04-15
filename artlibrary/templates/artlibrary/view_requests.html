@@ -120,9 +120,9 @@
         <h3>Borrow Requests</h3>
         {% for itemRequest in itemRequests %}
         <div class="row justify-content-center w-100 mb-3">
-            <div class="col-md-6 col-lg-4 w-100">
+            <div class="col-12 mb-4">
                 <div class="card shadow-sm">
-                    <div class="card-body text-center">
+                    <div class="card-body content-center text-center">
                         <div class="col-md-4 col-sm-6">
                             <div class="card h-100 shadow-sm">
                                 {% if itemRequest.item.image %}
@@ -132,7 +132,7 @@
                                 {% endif %}
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <a href="% url 'item_details' itemRequest.item.id %"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
+                                        <a href="{% url 'item_details' itemRequest.item.id %}"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
                                     </div>
                                     <p class="card-text">Quantity: {{ itemRequest.item.quantity }}</p>
                                 </div>
@@ -140,9 +140,14 @@
                         </div>
                         <h5 class="text-muted">Borrow request from: {{ itemRequest.patron.get_full_name }}</h5>
                         <h5 class="text-muted">Lending period: {{ itemRequest.lending_period }}</h5>
+                        <h5 class="text-muted">Borrow request from: {{ itemRequest.patron.get_full_name }}</h5>
+                        <h5 class="text-muted">Lending period: {{ itemRequest.lending_period }}</h5>
                         {% if not itemRequest.is_approved %}
                         <a href="{% url 'approve_item_request' itemRequest.id %}">
                             <button class="btn btn-success">Approve Request</button>
+                        </a>
+                        <a href="{% url 'deny_item_request' itemRequest.id %}">
+                            <button class="btn btn-danger">Deny Request</button>
                         </a>
                         {% endif %}
                     </div>
