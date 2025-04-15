@@ -297,14 +297,15 @@ def edit_item(request, id):
 def add_collection(request):
     if request.method == "POST":
         print("Form submitted!")
-        form = AddCollectionForm(request.POST)
+        form = AddCollectionForm(request.POST,request.user)
         if form.is_valid():
             print("Form is valid!")
 
             collection = form.save(commit=False)
             collection.added_by = request.user
+            if (request.user.user_role=="patron"):
+                collection.is_public=True
             collection.save()
-
             if not collection.is_public:
                 selected_users_ids = request.POST.getlist("private_users")
                 print("Selected user IDs:", selected_users_ids)
@@ -322,7 +323,7 @@ def add_collection(request):
         else:
             print("Form errors:", form.errors)
     else:
-        form = AddCollectionForm()
+        form = AddCollectionForm(user=request.user)
 
     users = CustomUser.objects.all()
 
