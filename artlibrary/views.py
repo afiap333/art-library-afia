@@ -248,18 +248,6 @@ def delete_collection(request,id):
         return redirect('collections')
     return render(request,'artlibrary/delete_collection.html',{'collection':collection})
 
-def update_item(request,id):
-    supply = get_object_or_404(ArtSupply, id=id)
-    print(supply)
-    if request.method=='POST':
-        form=AddArtSupplyForm(request.POST,instance=supply)
-        if form.is_valid():
-            form.save()
-            return redirect('librarian_page')
-    else:
-        form=AddArtSupplyForm(instance=supply)
-    return render(request,'artlibrary/edit_item.html',{'edit_item_form':form})
-
 def delete_item(request,id):
     supply = get_object_or_404(ArtSupply, id=id)
     if request.method=='POST':
@@ -267,8 +255,8 @@ def delete_item(request,id):
         return redirect('librarian_page')
     return render(request,'artlibrary/delete_item.html')
 
-def edit_item(request, item_id):
-    item = get_object_or_404(ArtSupply, id=item_id)
+def edit_item(request, id):
+    item = get_object_or_404(ArtSupply, id=id)
     all_collections = Collection.objects.all()
 
     if request.method == "POST":
@@ -280,17 +268,17 @@ def edit_item(request, item_id):
             selected_private_collection = Collection.objects.filter(id=request.POST.get("private_collection")).first()
 
             if selected_private_collection:
-                item.collections.set([selected_private_collection])
+                selected_private_collection.art_supplies.add(item)
             else:
-                item.collections.set(selected_public_collections)
-
+                for collection in selected_public_collections:
+                     collection.art_supplies.art_supplies.add(item)
             item.save()
-            return redirect("some_view")
+            return redirect("collections")
 
     else:
         form = AddArtSupplyForm(instance=item)
 
-    return render(request, "edit_item.html", {
+    return render(request, "artlibrary/edit_item.html", {
         "edit_item_form": form,
         "item": item,
         "collections": all_collections 

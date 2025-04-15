@@ -138,7 +138,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h5 class="text-muted">{Borrow request from: { itemRequest.patron.get_full_name }}</h5>
+                        <h5 class="text-muted">{Borrow request from: {{ itemRequest.patron.get_full_name }}</h5>
                         <h5 class="text-muted">{Lending period: { itemRequest.lending_period }}</h5>
                         {% if not itemRequest.is_approved %}
                         <a href="{% url 'approve_item_request' itemRequest.id %}">
