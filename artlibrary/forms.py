@@ -53,10 +53,9 @@ class AddCollectionForm(forms.ModelForm):
  
 class ProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False)
-    user_role = forms.ChoiceField(choices=CustomUser.roles, required=True)
     class Meta:
         model = CustomUser
-        fields = ['profile_pic','user_role']
+        fields = ['profile_pic']
 
 class BorrowForm(forms.ModelForm):
     class Meta:
