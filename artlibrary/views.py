@@ -276,14 +276,15 @@ def edit_item(request, id):
 
             selected_public_collections = Collection.objects.filter(id__in=request.POST.getlist("public_collections"))
             selected_private_collection = Collection.objects.filter(id=request.POST.get("private_collection")).first()
-
-            if selected_private_collection:
-                selected_private_collection.art_supplies.add(item)
+            collection_id = request.POST.get("private_collection")
+            if collection_id:
+                selected_private_collection = Collection.objects.filter(id__in=[collection_id]).first()
             else:
-                for collection in selected_public_collections:
+                selected_private_collection = None
+            for collection in selected_public_collections:
                      collection.art_supplies.art_supplies.add(item)
             item.save()
-            return redirect("collections")
+            return redirect("dashboard")
 
     else:
         form = AddArtSupplyForm(instance=item)
