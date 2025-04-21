@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from .models import ArtSupply
 
 # Create your tests here.
 
@@ -37,3 +38,10 @@ class defaultPatron(TestCase):
         self.client.force_login(self.user)
         response=self.client.get(reverse("redirect-login"))
         self.assertRedirects(response,reverse("dashboard")) 
+class createSupply(TestCase):
+    def setUp(self):
+        self.client=Client()
+        self.user=User.objects.create_user(username="test",password="password", email="newpatron@gmail.com")
+        self.supply=ArtSupply.objects.create(name="Test item",quantity=2,status="available",pickup_location="Charlottesville",item_type='single',added_by=self.user)
+    def test_supply_created(self):
+        self.assertEqual(self.supply.name,"Test item")
