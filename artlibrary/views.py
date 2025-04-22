@@ -107,9 +107,6 @@ def dashboard(request):
         available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
     else:
         available_items = ArtSupply.objects.all()
-        for item in available_items:
-            print(item.status)
-
     query = request.GET.get('query', '')
     
     print(query)
