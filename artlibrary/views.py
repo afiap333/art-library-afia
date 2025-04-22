@@ -166,9 +166,18 @@ def anonymous_page(request):
     else:
         user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
     available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(name__icontains=query)
+
     context = {
         'user':user,
         'available_items': available_items,
+        'query': query,
     }
     return render(request, 'artlibrary/anonymous.html', context)
 
