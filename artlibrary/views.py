@@ -343,6 +343,9 @@ def item_details(request,id):
         'reviews':reviews,
         }
         return render(request, 'artlibrary/item_details.html', context)
+    has_borrowed=False
+    if item.borrow_history and item in request.user.items_previously_borrowed.all():
+        has_borrowed=True
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
     review_form=ReviewForm()
@@ -373,6 +376,7 @@ def item_details(request,id):
         'collections': collections,
         'reviews':reviews,
         'review_exists':review_exists,
+        'has_borrowed':has_borrowed,
     }
     if(request.user.user_role=="anonymous"):
         context = {
@@ -436,6 +440,7 @@ def deny_collection_request(request,id):
 def approve_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
     supplyRequest.item.borrowed_by=supplyRequest.patron
+    supplyRequest.item.borrow_history.add(request.user)
     supplyRequest.item.status="checked_out"
     supplyRequest.is_approved=True
     supplyRequest.item.save()

@@ -53,6 +53,7 @@ class ArtSupply(models.Model):
     description = models.TextField(null=True, blank=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='added_items')
     borrowed_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='borrowed_items',null=True)
+    borrow_history= models.ManyToManyField(CustomUser,blank=True, related_name='items_previously_borrowed')
     def __str__(self):
         return self.name
     

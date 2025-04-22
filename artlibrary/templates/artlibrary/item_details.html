@@ -136,8 +136,8 @@
         <!-- Review Form -->
         <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
+                {% if request.user.is_authenticated and has_borrowed %}
                 <h2>Review Item</h2>
-                {% if request.user.is_authenticated %}
                     {% if review_exists %}
                         <p>You already reviewed the item!</p>
                     {% else %}
@@ -147,8 +147,6 @@
                             <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
                         </form>
                     {% endif %}
-                {% else %}
-                    <p>You must log in to review an item.</p>
                 {% endif %}
             </div>
         </div>
