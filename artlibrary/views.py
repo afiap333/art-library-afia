@@ -470,6 +470,7 @@ def request_collection(request,id):
     collectionRequested=get_object_or_404(Collection,id=id)
     existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
     if existing_request:
+        messages.warning(request,"You already requested access to this collection!")
         return redirect("collections")
     requestedCollection=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
     requestEmail="artlibrary2025@gmail.com"
@@ -508,6 +509,9 @@ def collection_details(request,id):
 def borrow_item(request,id):
     itemToBorrow=get_object_or_404(ArtSupply,id=id)
     borrow_form=BorrowForm()
+    if ArtSupplyRequest.objects.filter(patron=request.user,is_approved=False,item=itemToBorrow):
+        messages.warning(request,"You already requested to borrow this item!")
+        return redirect('dashboard')
     if request.method == 'POST':
         borrow_form=BorrowForm(request.POST)
         if borrow_form.is_valid():
@@ -537,6 +541,7 @@ def return_item(request,id):
 
 def borrowed_items(request):
     available_items = ArtSupply.objects.filter(borrowed_by=request.user)
+    pending_requests=ArtSupplyRequest.objects.filter(patron=request.user).filter(is_approved=False)
 
     query = request.GET.get('query', '')
     
@@ -551,5 +556,6 @@ def borrowed_items(request):
         'available_items': available_items,
         'collections': collections,
         'query': query,
+        'pending_requests':pending_requests,
     }
     return render(request, 'artlibrary/borrowed_items.html', context)

@@ -92,12 +92,15 @@
     </nav>
 
     <div class="container main-content py-4">
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body text-center py-4">
-                <h1 class="display-5 fw-bold text-brown">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
-                <p class="lead">Borrow and lend art supplies for your projects!</p>
-            </div>
+        {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissable" role="alert">
+            {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        {% endfor %}
+        {% endif %}
 
     <!-- Search Feature -->
 <div class="card border-0 shadow-sm mb-4">
