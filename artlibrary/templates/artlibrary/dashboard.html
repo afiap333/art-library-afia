@@ -91,7 +91,17 @@
             </div>
         </div>
     </nav>
-
+    <!--Asked chatgpt about styling messages-->
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissable" role="alert">
+            {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <div class="container main-content py-4">
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body text-center py-4">

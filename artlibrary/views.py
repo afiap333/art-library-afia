@@ -512,6 +512,7 @@ def borrow_item(request,id):
         borrow_form=BorrowForm(request.POST)
         if borrow_form.is_valid():
             art_request = borrow_form.save(commit=False)
+            messages.success(request,"Your borrow request was submitted!")
             art_request.item=itemToBorrow
             art_request.librarian=itemToBorrow.added_by
             art_request.patron=request.user
