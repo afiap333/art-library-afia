@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import ArtSupply,Collection,ArtSupplyRequest,Reviews
 from .models import CustomUser
+from django.core.validators import MinValueValidator
 
 class AddArtSupplyForm(forms.ModelForm):
     class Meta:
@@ -64,6 +65,16 @@ class BorrowForm(forms.ModelForm):
         widgets = {
             'lending_period': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+    def clean_lending_period(self):
+        lending_period=self.cleaned_data.get('lending_period')
+        if lending_period!='':
+            try:
+                lending_period = int(lending_period)
+            except(ValueError, TypeError):
+                raise forms.ValidationError("Must be a number")
+            if lending_period<=0:
+                raise forms.ValidationError("Lending period must be greater than 0.")
+        return lending_period
 
 class ReviewForm(forms.ModelForm):
     ratings = [
