@@ -65,6 +65,9 @@ class BorrowForm(forms.ModelForm):
         widgets = {
             'lending_period': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+        help_texts= {
+            'lending_period':"Enter how long you would like to borrow the item for.",
+        }
     def clean_lending_period(self):
         lending_period=self.cleaned_data.get('lending_period')
         if lending_period!='':

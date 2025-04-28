@@ -287,16 +287,17 @@ def edit_item(request, id):
         form = AddArtSupplyForm(request.POST, instance=item)
         if form.is_valid():
             item = form.save(commit=False)
-
+            for collection in Collection.objects.filter(art_supplies=item):
+                collection.art_supplies.remove(item)
             selected_public_collections = Collection.objects.filter(id__in=request.POST.getlist("public_collections"))
-            selected_private_collection = Collection.objects.filter(id=request.POST.get("private_collection")).first()
             collection_id = request.POST.get("private_collection")
             if collection_id:
-                selected_private_collection = Collection.objects.filter(id__in=[collection_id]).first()
+                selected_private_collection = Collection.objects.filter(id=request.POST.get("private_collection")).first()
+                selected_private_collection.art_supplies.add(item)
             else:
                 selected_private_collection = None
             for collection in selected_public_collections:
-                     collection.art_supplies.art_supplies.add(item)
+                     collection.art_supplies.add(item)
             item.save()
             return redirect("dashboard")
 
@@ -536,14 +537,14 @@ def borrow_item(request,id):
             art_request.librarian=itemToBorrow.added_by
             art_request.patron=request.user
             art_request.save()
+            requestEmail="artlibrary2025@gmail.com"
+            recepientEmail=itemToBorrow.added_by.email
+            email_subject="New borrow request for "+itemToBorrow.name
+            email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
+            send_mail(
+                email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
+            )
             return redirect('dashboard')
-    requestEmail="artlibrary2025@gmail.com"
-    recepientEmail=itemToBorrow.added_by.email
-    email_subject="New borrow request for "+itemToBorrow.name
-    email_message=request.user.get_full_name()+" requested to borrow an item! Go to the Art Supply library to approve now."
-    send_mail(
-        email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
-    )
     context={"item":itemToBorrow,"borrow_form":borrow_form}
     return render(request, 'artlibrary/borrow_item.html',context)
 

@@ -103,7 +103,7 @@
                         {% if collection.is_public %}
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="public_collections" value="{{ collection.id }}" id="public_{{ collection.id }}"
-                                    {% if collection in item.collections.all %}checked{% endif %}>
+                                    {% if item in collection.art_supplies.all %}checked{% endif %}>
                                 <label class="form-check-label" for="public_{{ collection.id }}">
                                     {{ collection.title }}
                                 </label>
@@ -121,7 +121,7 @@
                     {% for collection in collections %}
                         {% if not collection.is_public %}
                             <option value="{{ collection.id }}" 
-                                {% if collection in item.collections.all %}selected{% endif %}>
+                                {% if item in collection.art_supplies.all %}selected{% endif %}>
                                 {{ collection.title }}
                             </option>
                         {% endif %}
