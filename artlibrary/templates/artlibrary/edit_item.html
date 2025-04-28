@@ -96,7 +96,6 @@
             {{ edit_item_form.as_p }}
             
             <!-- Public Collections -->
-             {% if not in_private %}
             <div class="mb-3" id="public_collections_section">
                 <label class="form-label">Public Collections</label>
                 <div>
@@ -113,7 +112,6 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
     
             <!-- Private Collection -->
             <div class="mb-3">
