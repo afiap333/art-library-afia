@@ -1,6 +1,6 @@
 from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest,ArtSupplyRequest
+from .models import ArtSupply, Message, CustomUser, Collection, CollectionRequest, ArtSupplyRequest, Reviews
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm,ReviewForm
@@ -565,3 +565,36 @@ def borrowed_items(request):
         'pending_requests':pending_requests,
     }
     return render(request, 'artlibrary/borrowed_items.html', context)
+
+def edit_review(request, review_id):
+    review = get_object_or_404(Reviews, id=review_id)
+
+    if(request.user != review.user):
+        messages.error(request, "You can't edit someone else's review!")
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        new_text = request.POST.get("text")
+        if new_text:
+            review_text = new_text
+            review.save()
+            messages.success(request, "Review updated succesfully!")
+            return redirect("dashboard")
+
+    else:
+        # Renders a form pre-filled with existing review
+        return render(request, 'artlibrary/edit_review.html', {'review': review})
+
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
+
+    if request.user != review.user:
+        messages.error(request, "You can't delete someone else's review!")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        review.delete()
+        messages.success(request, "Review deleted successfully!")
+        return redirect('dashboard')
+
+    return render(request, 'artlibrary/confirm_delete.html', {'review': review})
