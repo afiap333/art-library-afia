@@ -74,7 +74,9 @@
                     {% if request.user.user_role != "anonymous_user" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>                    {% if request.user.user_role == "librarian" %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
+                    {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                     {% endif %}
@@ -86,7 +88,6 @@
                     </li>
                 </ul>
             </div>
-        </div>
     </nav>
     <!--reference: https://openclassrooms.com/en/courses/6967196-create-a-web-application-with-django/7349788-delete-objects-safely-with-user-confirmation-->
     <div class="container mt-4">

@@ -65,7 +65,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                 {% endif %}
@@ -73,6 +73,7 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
@@ -125,7 +126,7 @@
             <button type="submit" name="add_item" class="btn btn-success">Add Item</button>
         </form>
     </div>
-       <!---used chatgpt to debug and learn how to remove public collection option-->
+    
     <script>
         function publicCollections(){
             var publicCollections=document.getElementById('public-collections-section');
