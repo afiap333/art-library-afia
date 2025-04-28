@@ -94,7 +94,7 @@
             {% csrf_token %}
             {{ add_item_form.as_p }}
             
-            <div class="mb-3">
+            <div class="mb-3" id="public-collections-section">
                 <label class="form-label">Select Public Collections</label>
                 <div>
                     {% for collection in collections %}
@@ -125,10 +125,11 @@
             <button type="submit" name="add_item" class="btn btn-success">Add Item</button>
         </form>
     </div>
-
+       <!---used chatgpt to debug and learn how to remove public collection option-->
     <script>
         function publicCollections(){
             var publicCollections=document.getElementById('public-collections-section');
+            var privateCollectionSelect=document.getElementById('private_collection');
             if(privateCollectionSelect.value!==""){
                 publicCollections.style.display="none";
             }
@@ -138,7 +139,6 @@
         }
         document.addEventListener("DOMContentLoaded", function () {
             const collectionSelect = document.getElementById("collections");
-            publicCollections();
             collectionSelect.addEventListener("change", function () {
                 let selectedOptions = Array.from(collectionSelect.selectedOptions);
                 let privateCollections = selectedOptions.filter(opt => opt.dataset.public === "False");
@@ -152,7 +152,8 @@
 
         document.addEventListener("DOMContentLoaded", function () {
     const privateCollectionSelect = document.getElementById("private_collection");
-
+    publicCollections();
+    privateCollectionSelect.addEventListener("change",publicCollections);
 });
 
     </script>

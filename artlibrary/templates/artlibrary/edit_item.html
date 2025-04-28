@@ -97,7 +97,7 @@
             
             <!-- Public Collections -->
              {% if not in_private %}
-            <div class="mb-3">
+            <div class="mb-3" id="public_collections_section">
                 <label class="form-label">Public Collections</label>
                 <div>
                     {% for collection in collections %}
@@ -137,8 +137,18 @@
             {% endif %}
         </form>
     </div>    
-    
+    <!---used chatgpt to debug and learn how to remove public collection option-->
     <script>
+        function publicCollections(){
+            var publicCollections=document.getElementById('public_collections_section');
+            var privateCollectionSelect=document.getElementById('private_collection');
+            if(privateCollectionSelect.value!==""){
+                publicCollections.style.display="none";
+            }
+            else{
+                publicCollections.style.display='block';
+            }
+        }
         document.addEventListener("DOMContentLoaded", function () {
             const collectionSelect = document.getElementById("collections");
             collectionSelect.addEventListener("change", function () {
@@ -151,6 +161,12 @@
                 }
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const privateCollectionSelect = document.getElementById("private_collection");
+    publicCollections();
+    privateCollectionSelect.addEventListener("change",publicCollections);
+});
         document.addEventListener('DOMContentLoaded', function () {
         const isPublicCheckbox = document.getElementById('is_public_checkbox'); 
         const usersField = document.getElementById('id_users'); 
