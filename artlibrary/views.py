@@ -53,7 +53,7 @@ def update_profile(request):
 
     return render(request, "artlibrary/userprofile.html", {"form": form, "user": user})
 
-@login_required
+'''@login_required
 def librarian_page(request):
     query = request.GET.get('query', '')
 
@@ -75,6 +75,7 @@ def librarian_page(request):
         'query': query,
     }
     return render(request, 'artlibrary/librarian.html', context)
+'''
 
 @login_required
 def librarian_page(request):
