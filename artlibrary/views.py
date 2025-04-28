@@ -117,7 +117,7 @@ def dashboard(request):
     print(query)
 
     if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
+        available_items = available_items.objects.filter(name__icontains=query)
     
     collections = Collection.objects.all()
 
@@ -131,7 +131,7 @@ def dashboard(request):
 
 @login_required
 def add_item(request):
-    if(request.user.user_role!="librarian"):
+    if(request.user.user_role !="librarian"):
         if request.user.user_role=="anonymous":
             return redirect("anonymous_page")
         else:
