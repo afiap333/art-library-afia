@@ -196,6 +196,28 @@
 </div>
 </div>
     <!--Adding items pop up-->
+
+<!-- Borrowed Art Supplies Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="text-brown fw-bold mb-4">Borrowed Art Supplies</h2>
+        {% if borrowed_items %}
+            <ul class="list-group">
+            {% for item in borrowed_items %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ item.name }}
+                    <span class="badge {% if item.status == 'checked_out' %}bg-warning{% else %}bg-success{% endif %}">
+                        {{ item.status|capfirst }}
+                    </span>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info">No borrowed items currently.</div>
+        {% endif %}
+    </div>
+</div>
+
 </body>
 
 <!-- Footer -->
