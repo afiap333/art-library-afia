@@ -216,7 +216,7 @@ class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
         return params
 def collections(request):
     user_role = getattr(request.user, 'user_role', None)
-    if user_role == "anonymous_user":
+    if user_role == "anonymous":
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
