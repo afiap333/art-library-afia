@@ -103,20 +103,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const isPublicCheckbox = document.getElementById('id_is_public'); 
-        const privateUsersSection = document.getElementById('privateUsersSection');
+        const isPublicCheckbox = document.getElementById('is_public_checkbox'); 
+        const usersField = document.getElementById('id_users'); 
 
-        function togglePrivateUsersField() {
+        function toggleUsersField() {
             if (isPublicCheckbox.checked) {
-                privateUsersSection.style.display = 'none';
+                usersField.parentElement.style.display = 'none';
+                usersField.disabled = true;
             } else {
-                privateUsersSection.style.display = 'block';
+                usersField.parentElement.style.display = 'block';
+                usersField.disabled = false;
             }
         }
 
-        togglePrivateUsersField();
-        isPublicCheckbox.addEventListener('change', togglePrivateUsersField);
+        toggleUsersField();
+        isPublicCheckbox.addEventListener('change', toggleUsersField);
     });
+
     </script>
 </body>
 
