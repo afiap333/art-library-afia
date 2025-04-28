@@ -74,7 +74,6 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
@@ -119,7 +118,7 @@
             {% if query %}
             Search Results for "{{ query }}"
             {% else %}
-            Available Art Supplies
+            Art Supplies Checked Out
             {% endif %}
         </h3>
         <div class="dropdown">
@@ -173,9 +172,40 @@
         </div>
     </div>
 </div>
+<div class="container mt-4 flex-column align-items-center w-100">
+    <h3>Pending Borrow Requests</h3>
+    {% for itemRequest in pending_requests %}
+    <div class="col-md-4 col-sm-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card shadow-sm">
+                <div class="card-body content-center text-center">
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card h-100 shadow-sm">
+                            {% if itemRequest.item.image %}
+                                <img src="{{ itemRequest.item.image.url }}" alt="Item Image" class="mx-auto d-block" style="max-width: 100%; height: auto;">
+                            {% else %}
+                                <p>No image available</p>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <a href="{% url 'item_details' itemRequest.item.id %}"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
+                                </div>
+                                <p class="card-text">Quantity: {{ itemRequest.item.quantity }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="text-muted">Lending period: {{ itemRequest.lending_period }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <p class="text-muted">No borrow requests currently.</p>
+    </div>
+    {% endfor %}
 </div>
-    <!--Adding items pop up-->
-<!-- Modal for Adding Items -->
+
 
 </body>
 

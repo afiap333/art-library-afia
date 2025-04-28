@@ -73,7 +73,6 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
@@ -94,17 +93,20 @@
    <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-body text-center">
-            <h2 class="mb-3">{{ request.user.get_full_name }}</h2>
-            <p>Email: {{ request.user.email }}</p>
-            <p>Date Joined: {{ request.user.date_joined }}</p>
-
+            <div class="col-12 mt-2">
+                <h2 class="mb-3">{{ request.user.get_full_name }}</h2>
+                <p>Email: {{ request.user.email }}</p>
+                <p>Date Joined: {{ request.user.date_joined }}</p>
+                <span class="badge bg-success text-capitalize">{{request.user.user_role}}</span>
+            </div>
             <!-- ✅ Display Profile Picture -->
-            {% if request.user.profile_pic %}
-                <img src="{{ request.user.profile_pic.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-            {% else %}
-                <p class="text-muted">No profile picture uploaded.</p>
-            {% endif %}
-
+             <div class="col-12 mt-2">
+                {% if request.user.profile_pic %}
+                    <img src="{{ request.user.profile_pic.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <p class="text-muted">No profile picture uploaded.</p>
+                {% endif %}
+             </div>
             <!-- ✅ Profile Picture Upload Form -->
             <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile' %}" class="mt-3">
                 {% csrf_token %}
@@ -113,7 +115,11 @@
                 <div class="mb-3">
                     <input type="file" name="profile_pic" class="form-control">
                 </div>
+                {% if request.user.profile_pic %}
+                <button type="submit" class="btn btn-primary">Change Profile Picture</button>
+                {% else %}
                 <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
+                {% endif %}
             </form>
         </div>
     </div>

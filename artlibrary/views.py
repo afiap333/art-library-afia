@@ -1,6 +1,6 @@
 from django.shortcuts import render,resolve_url,get_object_or_404
 from django.http import HttpResponse
-from .models import ArtSupply, Message, CustomUser,Collection,CollectionRequest,ArtSupplyRequest
+from .models import ArtSupply, Message, CustomUser, Collection, CollectionRequest, ArtSupplyRequest, Reviews
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddArtSupplyForm,AddCollectionForm,BorrowForm,ReviewForm
@@ -53,7 +53,7 @@ def update_profile(request):
 
     return render(request, "artlibrary/userprofile.html", {"form": form, "user": user})
 
-@login_required
+'''@login_required
 def librarian_page(request):
     query = request.GET.get('query', '')
 
@@ -75,6 +75,7 @@ def librarian_page(request):
         'query': query,
     }
     return render(request, 'artlibrary/librarian.html', context)
+'''
 
 @login_required
 def librarian_page(request):
@@ -84,7 +85,8 @@ def librarian_page(request):
         return redirect('artlibrary')
     
     available_items = ArtSupply.objects.all()
-    
+    borrowed_items = ArtSupply.objects.exclude(status="available")
+
     print(query)
 
     if query:
@@ -94,6 +96,7 @@ def librarian_page(request):
 
     context = {
         'available_items': available_items,
+        'borrowed_items' : borrowed_items,
         'collections': collections,
         'query': query,
     }
@@ -105,20 +108,22 @@ def dashboard(request):
         return redirect('artlibrary')
     if request.user.user_role == 'patron':
         available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available").distinct()
+        borrowed_items = []
     else:
         available_items = ArtSupply.objects.all()
-
+        borrowed_items = ArtSupply.objects.exclude(status = "available")
     query = request.GET.get('query', '')
     
     print(query)
 
     if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
+        available_items = available_items.filter(name__icontains=query)
     
     collections = Collection.objects.all()
 
     context = {
         'available_items': available_items,
+        'borrowed_items': borrowed_items,
         'collections': collections,
         'query': query,
     }
@@ -126,7 +131,7 @@ def dashboard(request):
 
 @login_required
 def add_item(request):
-    if(request.user.user_role!="librarian"):
+    if(request.user.user_role !="librarian"):
         if request.user.user_role=="anonymous":
             return redirect("anonymous_page")
         else:
@@ -220,7 +225,7 @@ class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
         return params
 def collections(request):
     user_role = getattr(request.user, 'user_role', None)
-    if user_role == "anonymous_user":
+    if user_role == "anonymous":
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
         viewable_collections = Collection.objects.all()
@@ -353,6 +358,9 @@ def item_details(request,id):
         'reviews':reviews,
         }
         return render(request, 'artlibrary/item_details.html', context)
+    has_borrowed=False
+    if item.borrow_history and item in request.user.items_previously_borrowed.all():
+        has_borrowed=True
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
     review_form=ReviewForm()
@@ -383,6 +391,7 @@ def item_details(request,id):
         'collections': collections,
         'reviews':reviews,
         'review_exists':review_exists,
+        'has_borrowed':has_borrowed,
     }
     if(request.user.user_role=="anonymous"):
         context = {
@@ -446,6 +455,7 @@ def deny_collection_request(request,id):
 def approve_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
     supplyRequest.item.borrowed_by=supplyRequest.patron
+    supplyRequest.item.borrow_history.add(request.user)
     supplyRequest.item.status="checked_out"
     supplyRequest.is_approved=True
     supplyRequest.item.save()
@@ -475,6 +485,7 @@ def request_collection(request,id):
     collectionRequested=get_object_or_404(Collection,id=id)
     existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
     if existing_request:
+        messages.warning(request,"You already requested access to this collection!")
         return redirect("collections")
     requestedCollection=CollectionRequest.objects.create(collection=collectionRequested,patron=request.user,librarian=collectionRequested.added_by)
     requestEmail="artlibrary2025@gmail.com"
@@ -513,10 +524,14 @@ def collection_details(request,id):
 def borrow_item(request,id):
     itemToBorrow=get_object_or_404(ArtSupply,id=id)
     borrow_form=BorrowForm()
+    if ArtSupplyRequest.objects.filter(patron=request.user,is_approved=False,item=itemToBorrow):
+        messages.warning(request,"You already requested to borrow this item!")
+        return redirect('dashboard')
     if request.method == 'POST':
         borrow_form=BorrowForm(request.POST)
         if borrow_form.is_valid():
             art_request = borrow_form.save(commit=False)
+            messages.success(request,"Your borrow request was submitted!")
             art_request.item=itemToBorrow
             art_request.librarian=itemToBorrow.added_by
             art_request.patron=request.user
@@ -541,6 +556,7 @@ def return_item(request,id):
 
 def borrowed_items(request):
     available_items = ArtSupply.objects.filter(borrowed_by=request.user)
+    pending_requests=ArtSupplyRequest.objects.filter(patron=request.user).filter(is_approved=False)
 
     query = request.GET.get('query', '')
     
@@ -555,5 +571,39 @@ def borrowed_items(request):
         'available_items': available_items,
         'collections': collections,
         'query': query,
+        'pending_requests':pending_requests,
     }
     return render(request, 'artlibrary/borrowed_items.html', context)
+
+def edit_review(request, review_id):
+    review = get_object_or_404(Reviews, id=review_id)
+
+    if(request.user != review.user):
+        messages.error(request, "You can't edit someone else's review!")
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        new_text = request.POST.get("text")
+        if new_text:
+            review_text = new_text
+            review.save()
+            messages.success(request, "Review updated succesfully!")
+            return redirect("dashboard")
+
+    else:
+        # Renders a form pre-filled with existing review
+        return render(request, 'artlibrary/edit_review.html', {'review': review})
+
+def delete_review(request, review_id):
+    review = get_object_or_404(Reviews, id=review_id)
+
+    if request.user != review.user:
+        messages.error(request, "You can't delete someone else's review!")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        review.delete()
+        messages.success(request, "Review deleted successfully!")
+        return redirect('dashboard')
+
+    return render(request, 'artlibrary/confirm_delete.html', {'review': review})
