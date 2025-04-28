@@ -586,7 +586,7 @@ def edit_review(request, review_id):
         return render(request, 'artlibrary/edit_review.html', {'review': review})
 
 def delete_review(request, review_id):
-    review = get_object_or_404(Review, id=review_id)
+    review = get_object_or_404(Reviews, id=review_id)
 
     if request.user != review.user:
         messages.error(request, "You can't delete someone else's review!")
