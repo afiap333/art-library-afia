@@ -104,7 +104,7 @@ def dashboard(request):
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
     if request.user.user_role == 'patron':
-        available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+        available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available").distinct()
     else:
         available_items = ArtSupply.objects.all()
 
