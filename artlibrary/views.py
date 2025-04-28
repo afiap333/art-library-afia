@@ -144,15 +144,16 @@ def add_item(request):
             artSupply.added_by = request.user
             artSupply.save()
 
-            selected_public_collections = request.POST.getlist("public_collections")
-            for collection_id in selected_public_collections:
-                collection = Collection.objects.get(id=collection_id)
-                collection.art_supplies.add(artSupply)
-
             selected_private_collection = request.POST.get("private_collection")
             if selected_private_collection:
                 private_collection = Collection.objects.get(id=selected_private_collection)
                 private_collection.art_supplies.add(artSupply)
+
+            else:
+                selected_public_collections = request.POST.getlist("public_collections")
+                for collection_id in selected_public_collections:
+                    collection = Collection.objects.get(id=collection_id)
+                    collection.art_supplies.add(artSupply)
 
             for collection in Collection.objects.filter(art_supplies=artSupply):
                 collection.update_num_items()
@@ -282,7 +283,8 @@ def delete_item(request,id):
 def edit_item(request, id):
     item = get_object_or_404(ArtSupply, id=id)
     all_collections = Collection.objects.all()
-
+    private_collection=Collection.objects.filter(is_public=False,art_supplies=item)
+    in_private=private_collection.exists()
     if request.method == "POST":
         form = AddArtSupplyForm(request.POST, instance=item)
         if form.is_valid():
@@ -296,8 +298,8 @@ def edit_item(request, id):
                 selected_private_collection.art_supplies.add(item)
             else:
                 selected_private_collection = None
-            for collection in selected_public_collections:
-                     collection.art_supplies.add(item)
+                for collection in selected_public_collections:
+                        collection.art_supplies.add(item)
             item.save()
             return redirect("dashboard")
 
@@ -307,7 +309,8 @@ def edit_item(request, id):
     return render(request, "artlibrary/edit_item.html", {
         "edit_item_form": form,
         "item": item,
-        "collections": all_collections 
+        "collections": all_collections,
+        "in_private":in_private,
     })
 
 def add_collection(request):

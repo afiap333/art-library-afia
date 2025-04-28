@@ -127,8 +127,18 @@
     </div>
 
     <script>
+        function publicCollections(){
+            var publicCollections=document.getElementById('public-collections-section');
+            if(privateCollectionSelect.value!==""){
+                publicCollections.style.display="none";
+            }
+            else{
+                publicCollections.style.display='block';
+            }
+        }
         document.addEventListener("DOMContentLoaded", function () {
             const collectionSelect = document.getElementById("collections");
+            publicCollections();
             collectionSelect.addEventListener("change", function () {
                 let selectedOptions = Array.from(collectionSelect.selectedOptions);
                 let privateCollections = selectedOptions.filter(opt => opt.dataset.public === "False");
@@ -143,11 +153,6 @@
         document.addEventListener("DOMContentLoaded", function () {
     const privateCollectionSelect = document.getElementById("private_collection");
 
-    privateCollectionSelect.addEventListener("change", function () {
-        if (privateCollectionSelect.value !== "") {
-            alert("You can only select one private collection.");
-        }
-    });
 });
 
     </script>

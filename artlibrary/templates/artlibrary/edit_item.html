@@ -96,6 +96,7 @@
             {{ edit_item_form.as_p }}
             
             <!-- Public Collections -->
+             {% if not in_private %}
             <div class="mb-3">
                 <label class="form-label">Public Collections</label>
                 <div>
@@ -112,6 +113,7 @@
                     {% endfor %}
                 </div>
             </div>
+            {% endif %}
     
             <!-- Private Collection -->
             <div class="mb-3">
@@ -138,17 +140,35 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-        const privateCollectionSelect = document.getElementById("private_collection");
-        const publicCollectionCheckboxes = document.querySelectorAll("input[name='public_collections']");
-
-        privateCollectionSelect.addEventListener("change", function () {
-            if (privateCollectionSelect.value !== "") {
-                publicCollectionCheckboxes.forEach(checkbox => checkbox.disabled = true);
-            } else {
-                publicCollectionCheckboxes.forEach(checkbox => checkbox.disabled = false);
-            }
+            const collectionSelect = document.getElementById("collections");
+            collectionSelect.addEventListener("change", function () {
+                let selectedOptions = Array.from(collectionSelect.selectedOptions);
+                let privateCollections = selectedOptions.filter(opt => opt.dataset.public === "False");
+                
+                if (privateCollections.length > 1) {
+                    alert("You can only select one private collection.");
+                    privateCollections.forEach(opt => opt.selected = false);
+                }
+            });
         });
+        document.addEventListener('DOMContentLoaded', function () {
+        const isPublicCheckbox = document.getElementById('is_public_checkbox'); 
+        const usersField = document.getElementById('id_users'); 
+
+        function toggleUsersField() {
+            if (isPublicCheckbox.checked) {
+                usersField.parentElement.style.display = 'none';
+                usersField.disabled = true;
+            } else {
+                usersField.parentElement.style.display = 'block';
+                usersField.disabled = false;
+            }
+        }
+
+        toggleUsersField();
+        isPublicCheckbox.addEventListener('change', toggleUsersField);
     });
+
     </script>
 
 </body>
