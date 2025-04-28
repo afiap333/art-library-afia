@@ -117,7 +117,7 @@ def dashboard(request):
     print(query)
 
     if query:
-        available_items = available_items.objects.filter(name__icontains=query)
+        available_items = available_items.filter(name__icontains=query)
     
     collections = Collection.objects.all()
 
