@@ -84,7 +84,8 @@ def librarian_page(request):
         return redirect('artlibrary')
     
     available_items = ArtSupply.objects.all()
-    
+    borrowed_items = ArtSupply.objects.exclude(status="available")
+
     print(query)
 
     if query:
@@ -94,6 +95,7 @@ def librarian_page(request):
 
     context = {
         'available_items': available_items,
+        'borrowed_items' : borrowed_items,
         'collections': collections,
         'query': query,
     }
@@ -105,8 +107,10 @@ def dashboard(request):
         return redirect('artlibrary')
     if request.user.user_role == 'patron':
         available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+        borrowed_items = []
     else:
         available_items = ArtSupply.objects.all()
+        borrowed_items = ArtSupply.objects.exclude(status = "available")
     query = request.GET.get('query', '')
     
     print(query)
@@ -118,6 +122,7 @@ def dashboard(request):
 
     context = {
         'available_items': available_items,
+        'borrowed_items': borrowed_items,
         'collections': collections,
         'query': query,
     }
