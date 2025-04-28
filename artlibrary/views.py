@@ -500,7 +500,7 @@ def collection_details(request,id):
     print(query)
 
     if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
+        available_items = ArtSupply.objects.filter(collections_in=collectionRequested, name__icontains=query)
 
     context = {
         'available_items': available_items,
