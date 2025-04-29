@@ -118,6 +118,9 @@
                 {% endif %}
                 <div class="row mt-3 g-2 justify-content-center">
                     <div class="col-6">
+                        {% if item.status == "available" %}
+                        <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
+                        {% endif %}
                         {% if request.user.user_role == "librarian" %}
                         <a href="{% url 'edit_item' item.id %}" class="btn btn-brown">Edit</a>
                         <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
