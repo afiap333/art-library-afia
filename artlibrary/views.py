@@ -585,23 +585,21 @@ def borrowed_items(request):
     return render(request, 'artlibrary/borrowed_items.html', context)
 
 def edit_review(request, review_id):
-    review = get_object_or_404(Reviews, id=review_id)
+    review = get_object_or_404(Reviews, id=review_id, user=request.user)
 
     if(request.user != review.user):
         messages.error(request, "You can't edit someone else's review!")
         return redirect("dashboard")
 
     if request.method == "POST":
-        new_text = request.POST.get("text")
-        if new_text:
-            review_text = new_text
-            review.save()
-            messages.success(request, "Review updated succesfully!")
-            return redirect("dashboard")
-
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect('item_details', item_id=review.item.id)
     else:
-        # Renders a form pre-filled with existing review
-        return render(request, 'artlibrary/edit_review.html', {'review': review})
+        form = ReviewForm(instance=review)
+
+    return render(request, 'edit_review.html', {'form': form})
 
 def delete_review(request, review_id):
     review = get_object_or_404(Reviews, id=review_id)
@@ -613,7 +611,7 @@ def delete_review(request, review_id):
     if request.method == 'POST':
         review.delete()
         messages.success(request, "Review deleted successfully!")
-        return redirect('dashboard')
+        return redirect('item_details', item_id=review.item.id)
 
     return render(request, 'artlibrary/confirm_delete.html', {'review': review})
 
