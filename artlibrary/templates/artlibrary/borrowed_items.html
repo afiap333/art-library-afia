@@ -88,7 +88,7 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
 
     <div class="container main-content py-4">
         <div class="card border-0 shadow-sm mb-4">
@@ -96,134 +96,132 @@
                 <h1 class="display-5 fw-bold text-brown">Borrowed Items</h1>
             </div>
         </div>
+    </div>
 
     <!-- Search Feature -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body p-3">
-        <form method="get" action="">
-            <div class="input-group">
-                <input type="text" name="query" class="form-control form-control-lg" placeholder="Search by title or collection..." value="{{ query }}">
-                <button type="submit" class="btn btn-brown">Search</button>
-                {% if query %}
-                <a href="{% url 'librarian_page' %}" class="btn btn-outline-secondary ms-2">Clear</a>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Borrowed Art Supplies -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h3 class="card-title text-brown fw-bold mb-0">
-            {% if query %}
-            Search Results for "{{ query }}"
-            {% else %}
-            Art Supplies Checked Out
-            {% endif %}
-        </h3>
-        <div class="dropdown">
-            <button class="btn btn-outline-brown dropdown-toggle" type="button" data-bs-toggle="dropdown">Sort By</button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Newest First</a></li>
-                <li><a class="dropdown-item" href="#">Name (A-Z)</a></li>
-                <li><a class="dropdown-item" href="#">Availability</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="card-body p-4">
-        <div class="row g-4">
-            {% for item in available_items %}
-            <div class="col-md-4 col-sm-6">
-                <div class="card h-100 shadow-sm">
-                    {% if item.image %}
-                        <img src="{{ item.image.url }}" alt="Item Image">
-                    {% else %}
-                        <p>No image available</p>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form method="get" action="">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control form-control-lg" placeholder="Search by title or collection..." value="{{ query }}">
+                    <button type="submit" class="btn btn-brown">Search</button>
+                    {% if query %}
+                    <a href="{% url 'librarian_page' %}" class="btn btn-outline-secondary ms-2">Clear</a>
                     {% endif %}
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <h5 class="card-title text-brown">{{ item.name }}</h5>
-                            <span class="badge bg-success">Available</span>
-                        </div>
-                        <p class="card-text">Quantity: {{ item.quantity }}</p>
-                        <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
-                        <div class="mt-3">
-                            <a href="#" class="btn btn-brown">Borrow</a>
-                            <a href="{% url 'item_details' item.id %}" class="btn btn-outline-brown ms-2">Details</a>
-                        </div>
-                        <div class="mt-3">
-                            {% if request.user.user_role == "librarian" %}
-                            <button type="submit" class="btn btn-brown"><a href="{% url 'edit_item' item.id%}">Edit</a></button>
-                            <button type="submit" class="btn btn-danger"><a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a></button>
-                            {% endif %}
-                        </div>
-                    </div>
                 </div>
-            </div>
-            {% empty %}
-            <div class="col-12">
-                {% if query %}
-                <div class="alert alert-info">No matches found for "{{ query }}"</div>
-                {% else %}
-                <div class="alert alert-info">No Art Supplies Currently Available</div>
-                {% endif %}
-            </div>
-            {% endfor %}
+            </form>
         </div>
     </div>
-</div>
-<div class="container mt-4 flex-column align-items-center w-100">
-    <h3>Pending Borrow Requests</h3>
-    {% for itemRequest in pending_requests %}
-    <div class="col-md-4 col-sm-6">
-        <div class="card h-100 shadow-sm">
-            <div class="card shadow-sm">
-                <div class="card-body content-center text-center">
-                    <div class="col-md-4 col-sm-6">
-                        <div class="card h-100 shadow-sm">
-                            {% if itemRequest.item.image %}
-                                <img src="{{ itemRequest.item.image.url }}" alt="Item Image" class="mx-auto d-block" style="max-width: 100%; height: auto;">
-                            {% else %}
-                                <p>No image available</p>
-                            {% endif %}
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <a href="{% url 'item_details' itemRequest.item.id %}"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
-                                </div>
-                                <p class="card-text">Quantity: {{ itemRequest.item.quantity }}</p>
+
+    <!-- Borrowed Art Supplies -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h3 class="card-title text-brown fw-bold mb-0">
+                {% if query %}
+                Search Results for "{{ query }}"
+                {% else %}
+                Art Supplies Checked Out
+                {% endif %}
+            </h3>
+            <div class="dropdown">
+                <button class="btn btn-outline-brown dropdown-toggle" type="button" data-bs-toggle="dropdown">Sort By</button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Newest First</a></li>
+                    <li><a class="dropdown-item" href="#">Name (A-Z)</a></li>
+                    <li><a class="dropdown-item" href="#">Availability</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-4">
+                {% for item in available_items %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 shadow-sm">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="Item Image">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title text-brown">{{ item.name }}</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                            <p class="card-text">Quantity: {{ item.quantity }}</p>
+                            <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-brown">Borrow</a>
+                                <a href="{% url 'item_details' item.id %}" class="btn btn-outline-brown ms-2">Details</a>
+                            </div>
+                            <div class="mt-3">
+                                {% if request.user.user_role == "librarian" %}
+                                <button type="submit" class="btn btn-brown"><a href="{% url 'edit_item' item.id%}">Edit</a></button>
+                                <button type="submit" class="btn btn-danger"><a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a></button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                    <h5 class="text-muted">Lending period: {{ itemRequest.lending_period }}</h5>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    {% if query %}
+                    <div class="alert alert-info">No matches found for "{{ query }}"</div>
+                    {% else %}
+                    <div class="alert alert-info">No Art Supplies Currently Available</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="container mt-4 flex-column align-items-center w-100">
+        <h3>Pending Borrow Requests</h3>
+        {% for itemRequest in pending_requests %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card shadow-sm">
+                    <div class="card-body content-center text-center">
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card h-100 shadow-sm">
+                                {% if itemRequest.item.image %}
+                                    <img src="{{ itemRequest.item.image.url }}" alt="Item Image" class="mx-auto d-block" style="max-width: 100%; height: auto;">
+                                {% else %}
+                                    <p>No image available</p>
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <a href="{% url 'item_details' itemRequest.item.id %}"> <h4 class="card-title">{{ itemRequest.item.name }}</h4></a>
+                                    </div>
+                                    <p class="card-text">Quantity: {{ itemRequest.item.quantity }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="text-muted">Lending period: {{ itemRequest.lending_period }}</h5>
+                    </div>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-muted">No borrow requests currently.</p>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="col-12">
-        <p class="text-muted">No borrow requests currently.</p>
-    </div>
-    {% endfor %}
-</div>
 
-
-</body>
-
-<!-- Footer -->
-<footer class="py-3 bg-dark text-white mt-auto bg-brown">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
-                <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
-                <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+    <!-- Footer -->
+    <footer class="py-3 bg-dark text-white mt-auto bg-brown">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                    <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 </body>
 </html>
