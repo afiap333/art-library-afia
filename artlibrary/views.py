@@ -509,8 +509,9 @@ def request_collection(request,id):
     return redirect("collections")
 
 def collection_details(request,id):
-    user_role = request.session.get('user_role', 'anonymous')  # Default to 'anonymous' if not set
-    print(f"User Role: {user_role}")
+    user_role = request.session.get('user_role')
+    if not user_role and request.user.is_authenticated:
+        user_role = getattr(request.user, 'user_role', 'patron')
 
     collectionRequested=get_object_or_404(Collection,id=id)
     available_items=ArtSupply.objects.filter(collections_in=collectionRequested).filter(status="available")
