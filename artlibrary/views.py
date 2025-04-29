@@ -258,6 +258,11 @@ def update_collection(request,id):
     if request.method=='POST' and "edit_collection" in request.POST:
         form=AddCollectionForm(request.POST,instance=collection,user=request.user)
         if form.is_valid():
+            updated_collection=form.save(commit=False)
+            if(updated_collection.is_public==False):
+                for item in collection.art_supplies.all():
+                    item.collections_in.remove(*item.collections_in.exclude(id=collection.id))
+            updated_collection.save()
             form.save()
             return redirect('collections')
     else:
