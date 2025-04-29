@@ -171,7 +171,7 @@ def anonymous_page(request):
         user=request.user
     else:
         user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available").distinct()
 
     query = request.GET.get('query', '')
     
