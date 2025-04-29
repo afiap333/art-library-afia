@@ -167,11 +167,12 @@ def add_item(request):
     })
 
 def anonymous_page(request):
-    if request.user.is_authenticated:
-        user=request.user
-    else:
-        user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
-    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available")
+    # if request.user.is_authenticated:
+    #     user=request.user
+    # else:
+    request.session['user_role'] = 'anonymous'
+    user=CustomUser(id=0,username="Anonymous",user_role="anonymous")
+    available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available").distinct()
 
     query = request.GET.get('query', '')
     
@@ -225,7 +226,10 @@ class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
         
         return params
 def collections(request):
-    user_role = getattr(request.user, 'user_role', None)
+    user_role = request.session.get('user_role')
+    if not user_role and request.user.is_authenticated:
+        user_role = getattr(request.user, 'user_role', 'patron')
+
     if user_role == "anonymous":
         viewable_collections = Collection.objects.filter(is_public=True)
     else:
@@ -241,10 +245,12 @@ def collections(request):
         viewable_collections = viewable_collections.filter(title__icontains=query)
 
     context = {
+        'user_role': user_role,
         'viewable_collections': viewable_collections,
         'query': query,
     }
     return render(request, 'artlibrary/collections.html', context)
+
 def update_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
     itemsInCollection=collection.art_supplies.all()
@@ -508,9 +514,14 @@ def request_collection(request,id):
     return redirect("collections")
 
 def collection_details(request,id):
+    user_role = request.session.get('user_role')
+    if not user_role and request.user.is_authenticated:
+        user_role = getattr(request.user, 'user_role', 'patron')
+
     collectionRequested=get_object_or_404(Collection,id=id)
     available_items=ArtSupply.objects.filter(collections_in=collectionRequested).filter(status="available")
     context = {
+        'user_role': user_role,
         'collection':collectionRequested,
         'available_items': available_items,
     }
@@ -523,6 +534,7 @@ def collection_details(request,id):
         available_items = ArtSupply.objects.filter(collections_in=collectionRequested, name__icontains=query)
 
     context = {
+        'user_role': user_role,
         'available_items': available_items,
         'collections': collections,
         'query': query,

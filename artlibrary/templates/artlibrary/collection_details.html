@@ -58,28 +58,38 @@
     </style>
 </head>
 <body class="bg-light">
+    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
         <div class="container">
-            <a class="navbar-brand" href="#">Collection details</a>
+            <a class="navbar-brand" href="#">Collections</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+                    {% if user_role != "anonymous" %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
+                    {% endif %}
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                     {% endif %}
-                    {% if request.user.user_role != "anonymous_user" %}
+                    {% if user_role != "anonymous" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                    {% if user_role != "anonymous" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
+                    {% endif %}
+                    {% if user_role == "anonymous" %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
+                    {% endif %}
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                     {% endif %}
-                    {% if request.user.user_role != "anonymous_user" %}
+                    {% if user_role != "anonymous" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
                     {% endif %}
                     <li class="nav-item">
@@ -88,7 +98,7 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
 
     <div class="container main-content py-4">
         <div class="card border-0 shadow-sm mb-4">
@@ -122,14 +132,6 @@
             Available Art Supplies
             {% endif %}
         </h3>
-        <div class="dropdown">
-            <button class="btn btn-outline-brown dropdown-toggle" type="button" data-bs-toggle="dropdown">Sort By</button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Newest First</a></li>
-                <li><a class="dropdown-item" href="#">Name (A-Z)</a></li>
-                <li><a class="dropdown-item" href="#">Availability</a></li>
-            </ul>
-        </div>
     </div>
     <div class="card-body p-4">
         <div class="row g-4">
@@ -149,7 +151,9 @@
                         <p class="card-text">Quantity: {{ item.quantity }}</p>
                         <p class="card-text"><small class="text-muted">Pickup at: {{ item.pickup_location }}</small></p>
                         <div class="mt-3">
+                            {% if user_role != "anonymous" %}
                             <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
+                            {% endif %}
                             <a href="{% url 'item_details' item.id %}" class="btn btn-outline-brown ms-2">Details</a>
                         </div>
                         <div class="mt-3">
