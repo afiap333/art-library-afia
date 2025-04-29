@@ -159,7 +159,7 @@ def add_item(request):
                 collection.update_num_items()
 
             messages.success(request, "Item added successfully!")
-            return redirect('librarian_page')
+            return redirect('dashboard')
 
     return render(request, 'artlibrary/add_item.html', {
         'add_item_form': add_item_form,
@@ -277,7 +277,7 @@ def delete_item(request,id):
     supply = get_object_or_404(ArtSupply, id=id)
     if request.method=='POST':
         supply.delete()
-        return redirect('librarian_page')
+        return redirect('dashboard')
     return render(request,'artlibrary/delete_item.html')
 
 def edit_item(request, id):

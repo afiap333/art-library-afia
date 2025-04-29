@@ -118,7 +118,7 @@
                 <input type="text" name="query" class="form-control form-control-lg" placeholder="Search by title or collection..." value="{{ query }}">
                 <button type="submit" class="btn btn-brown">Search</button>
                 {% if query %}
-                <a href="{% url 'librarian_page' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary ms-2">Clear</a>
                 {% endif %}
             </div>
         </form>
