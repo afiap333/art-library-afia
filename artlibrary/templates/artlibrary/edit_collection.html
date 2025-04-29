@@ -147,7 +147,27 @@
     {% endfor %}
 </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const isPublicCheckbox = document.getElementById('is_public_checkbox'); 
+        const usersField = document.getElementById('id_users'); 
 
+        function toggleUsersField() {
+            if (isPublicCheckbox.checked) {
+                usersField.parentElement.style.display = 'none';
+                usersField.disabled = true;
+            } else {
+                usersField.parentElement.style.display = 'block';
+                usersField.disabled = false;
+            }
+        }
+
+        toggleUsersField();
+        isPublicCheckbox.addEventListener('change', toggleUsersField);
+    });
+
+    </script>   
 </body>
 
 <!-- Footer -->
