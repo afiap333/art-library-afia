@@ -121,28 +121,30 @@
                         {% if item.status == "available" %}
                         <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
                         {% endif %}
-                        {% if request.user.user_role == "librarian" %}
-                        <a href="{% url 'edit_item' item.id %}" class="btn btn-brown">Edit</a>
-                        <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
+                        {% if request.user.user_role == "librarian" or has_borrowed %}
+                        <a href="{% url 'edit_item' item.id %}" class="btn btn-brown">Edit Review</a>
+                        <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete Review</a>
                     {% endif %}
                     </div>
                 </div>
             </div>
         </div>
         <!-- Review Form -->
-        <div class="row justify-content-center mt-4">
+        <div class="row justify-content-center mt-5">
             <div class="col-md-8 col-lg-6">
-                {% if request.user.is_authenticated and has_borrowed %}
-                <h2>Review Item</h2>
+                {% if request.user.is_authenticated %}
+                    {% if request.user.user_role == "librarian" or has_borrowed %}
+                    <h2>Review Item</h2>
                     {% if review_exists %}
-                        <p>You already reviewed the item!</p>
+                        <p>You already reviewed this item.</p>
                     {% else %}
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {{ review_form.as_p }}
-                            <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
-                            <button type="submit" name="delete_review" class="btn btn-success">Delete review</button>
-                        </form>
+                    <!-- Only show form if user hasn’t already submitted a review -->
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ review_form.as_p }}
+                        <button type="submit" name="submit_review" class="btn btn-success">Submit Review</button>
+                    </form>
+                    {% endif %}
                     {% endif %}
                 {% endif %}
             </div>
@@ -152,23 +154,23 @@
             <div class="col-md-8 col-lg-6">
                 <h3>Reviews</h3>
                 {% for review in reviews %}
-                    <div class="card mb-3">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Review by {{ review.user }}</h5>
-                            {% if review.user == request.user %}
-                                <div>
-                                    <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                                </div>
-                            {% endif %}
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Review by {{ review.user }}</h5>
+                        {% if review.user == request.user %}
+                        <div>
+                             <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary">Edit Review</a>
+                             <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger">Delete Review</a>
                         </div>
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">Rating: {{ review.rating }}/5</h6>
-                            <p class="card-text">{{ review.comment }}</p>
-                        </div>
+                        {% endif %}
                     </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Rating: {{ review.rating }}/5</h6>
+                        <p class="card-text">{{ review.comment }}</p>
+                    </div>
+                </div>
                 {% empty %}
-                    <p>No reviews yet.</p>
+                <p>No reviews yet.</p>
                 {% endfor %}
             </div>
         </div>
