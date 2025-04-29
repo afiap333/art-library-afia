@@ -248,7 +248,7 @@ def collections(request):
 def update_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
     itemsInCollection=collection.art_supplies.all()
-    not_in_collection = ArtSupply.objects.exclude(collections_in=collection).filter( Q(collections_in__is_public=True) | Q(collections_in__isnull=True))
+    not_in_collection = ArtSupply.objects.exclude(collections_in=collection).filter( Q(collections_in__is_public=True) | Q(collections_in__isnull=True)).distinct()
     if request.method=='POST' and "edit_collection" in request.POST:
         form=AddCollectionForm(request.POST,instance=collection,user=request.user)
         if form.is_valid():
