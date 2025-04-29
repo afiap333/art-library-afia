@@ -611,7 +611,7 @@ def delete_review(request, review_id):
     if request.method == 'POST':
         review.delete()
         messages.success(request, "Review deleted successfully!")
-        return redirect('item_details', item_id=review.item.id)
+        return redirect('item_details', id=review.item.id)
 
     return render(request, 'artlibrary/confirm_delete.html', {'review': review})
 

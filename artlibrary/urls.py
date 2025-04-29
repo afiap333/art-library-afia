@@ -44,6 +44,6 @@ urlpatterns = [
     path('<int:id>/mark_as_returned/',views.return_item,name="mark_as_returned"),
     path('reviews/edit/<int:review_id>/', views.edit_review, name='edit_review'),
     path('review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
-    path('items/<int:item_id>/', views.item_details, name='item_details'),  # used in cancel button
+    #path('items/<int:item_id>/', views.item_details, name='item_details'),  # used in cancel button
 
 ]
