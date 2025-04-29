@@ -135,14 +135,6 @@
             Available Art Supplies
             {% endif %}
         </h3>
-        <div class="dropdown">
-            <button class="btn btn-outline-brown dropdown-toggle" type="button" data-bs-toggle="dropdown">Sort By</button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Newest First</a></li>
-                <li><a class="dropdown-item" href="#">Name (A-Z)</a></li>
-                <li><a class="dropdown-item" href="#">Availability</a></li>
-            </ul>
-        </div>
     </div>
     <div class="card-body p-4">
         <div class="row g-4">
@@ -196,27 +188,6 @@
 </div>
 </div>
     <!--Adding items pop up-->
-
-<!-- Borrowed Art Supplies Section -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body p-4">
-        <h2 class="text-brown fw-bold mb-4">Borrowed Art Supplies</h2>
-        {% if borrowed_items %}
-            <ul class="list-group">
-            {% for item in borrowed_items %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ item.name }}
-                    <span class="badge {% if item.status == 'checked_out' %}bg-warning{% else %}bg-success{% endif %}">
-                        {{ item.status|capfirst }}
-                    </span>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <div class="alert alert-info">No borrowed items currently.</div>
-        {% endif %}
-    </div>
-</div>
 
 </body>
 
