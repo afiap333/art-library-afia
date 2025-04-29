@@ -611,3 +611,29 @@ def delete_review(request, review_id):
         return redirect('dashboard')
 
     return render(request, 'artlibrary/confirm_delete.html', {'review': review})
+
+def alphabetize_items(request):
+    if request.user.user_role == 'anonymous':
+        return redirect('artlibrary')
+    if request.user.user_role == 'patron':
+        available_items = ArtSupply.objects.filter(Q(collections_in__isnull=True) | Q(collections_in__is_public=True)).filter(status="available").distinct()
+        borrowed_items = []
+    else:
+        available_items = ArtSupply.objects.all()
+        borrowed_items = ArtSupply.objects.exclude(status = "available")
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = available_items.filter(name__icontains=query)
+    
+    collections = Collection.objects.all()
+
+    context = {
+        'available_items': available_items,
+        'borrowed_items': borrowed_items,
+        'collections': collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/dashboard.html', context)
