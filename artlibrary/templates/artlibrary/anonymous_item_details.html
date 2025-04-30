@@ -1,0 +1,148 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item details</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        :root {
+            --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
+            --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
+            --bs-dark: #5D4037;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        .bg-brown {
+            background-color: #8B5A2B !important;
+        }
+        
+        .text-brown {
+            color: #8B5A2B !important;
+        }
+        
+        .btn-brown {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+            color: white;
+        }
+        
+        .btn-outline-brown {
+            border-color: #8B5A2B;
+            color: #8B5A2B;
+        }
+        
+        .btn-outline-brown:hover {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Item details</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_collections' %}">Collections</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<body class="bg-light">
+
+
+    <!-- Available Art Supplies -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 text-center">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" class="img-fluid mb-3" alt="{{ item.name }}">
+                {% endif %}
+                <h5 class="card-title text-brown">{{ item.name }}</h5>
+                {% if item.status == "checked_out" %}
+                            <span class="badge bg-warning">Checked out</span>
+                            {% else %}
+                            <span class="badge bg-success">Available</span>
+                            {% endif %}
+                {% if item.quantity %}
+                    <h6>Quantity</h6>
+                    <p>{{ item.quantity }}</p>
+                {% endif %}
+                {% if item.pickup_location %}
+                    <p class="card-text"><strong>Pickup at:</strong> {{ item.pickup_location }}</p>
+                {% endif %}
+                {% if item.use_policy %}
+                    <p class="card-text"><strong>Use policy:</strong> {{ item.use_policy }}</p>
+                {% endif %}
+                {% if item.description %}
+                    <p class="card-text"><strong>Description:</strong> {{ item.description }}</p>
+                {% endif %}
+                {% if item.item_type %}
+                    <p class="card-text"><strong>Use type:</strong> {{ item.item_type }}-use</p>
+                {% endif %}
+            </div>
+        </div>
+       
+        <!-- Reviews -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8 col-lg-6">
+                <h3>Reviews</h3>
+                {% for review in reviews %}
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Review by {{ review.user }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Rating: {{ review.rating }}/5</h6>
+                            <p class="card-text">{{ review.comment }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No reviews yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <footer class="py-3 bg-dark text-white mt-auto bg-brown">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                    <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
