@@ -374,7 +374,8 @@ def item_details(request,id):
         }
         return render(request, 'artlibrary/item_details.html', context)
     has_borrowed=False
-    if item.borrow_history and item in request.user.items_previously_borrowed.all():
+    print(item.borrow_history)
+    if item.borrow_history.filter(id=request.user.id).exists():
         has_borrowed=True
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
@@ -382,6 +383,7 @@ def item_details(request,id):
     reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
     review_exists = item.ratings.filter(user=request.user).exists()
+    print(has_borrowed)
     if request.method == "POST":
         if "add_to_collection" in request.POST:
             add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
@@ -470,7 +472,8 @@ def deny_collection_request(request,id):
 def approve_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
     supplyRequest.item.borrowed_by=supplyRequest.patron
-    supplyRequest.item.borrow_history.add(request.user)
+    print(supplyRequest.patron)
+    supplyRequest.item.borrow_history.add(supplyRequest.patron)
     supplyRequest.item.status="checked_out"
     supplyRequest.is_approved=True
     supplyRequest.item.save()
