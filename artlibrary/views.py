@@ -213,7 +213,12 @@ def profile(request):
 def logout_view(request):
     logout(request)
     request.session.flush()
-    return redirect('index')
+
+    google_logout_url = "https://accounts.google.com/Logout"
+    redirect_uri = request.build_absolute_uri('https://art-library-871f7414fac3.herokuapp.com/')
+    continue_url = f"https://appengine.google.com/_ah/logout?continue={urllib.parse.quote(redirect_uri)}"
+
+    return redirect(f"{google_logout_url}?continue={urllib.parse.quote(continue_url)}")
 
 class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
     def get_auth_params(self, request, action):
