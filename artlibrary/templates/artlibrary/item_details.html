@@ -65,20 +65,29 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
+            {% endif %}
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                 {% endif %}
-                {% if request.user.user_role != "anonymous_user" %}
+                {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
+                {% endif %}
                 {% if request.user.user_role == "librarian" %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                 {% endif %}
-                {% if request.user.user_role != "anonymous_user" %}
+                {% if not user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
+                    {% endif %}
+                {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
                 {% endif %}
                 <li class="nav-item">
@@ -99,7 +108,11 @@
                     <img src="{{ item.image.url }}" class="img-fluid mb-3" alt="{{ item.name }}">
                 {% endif %}
                 <h5 class="card-title text-brown">{{ item.name }}</h5>
-                <span class="badge bg-success mb-3">{{ item.status }}</span>
+                {% if item.status == "checked_out" %}
+                            <span class="badge bg-warning">Checked out</span>
+                            {% else %}
+                            <span class="badge bg-success">Available</span>
+                            {% endif %}
                 {% if item.quantity %}
                     <h6>Quantity</h6>
                     <p>{{ item.quantity }}</p>
@@ -118,7 +131,7 @@
                 {% endif %}
                 <div class="row mt-3 g-2 justify-content-center">
                     <div class="col-6">
-                        {% if item.status == "available" %}
+                        {% if item.status == "available" and user.is_authenticated %}
                         <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
                         {% endif %}
                         {% if request.user.user_role == "librarian" %}
@@ -132,7 +145,7 @@
         <!-- Review Form -->
         <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
-                {% if request.user.is_authenticated and has_borrowed %}
+                {% if has_borrowed %}
                 <h2>Review Item</h2>
                     {% if review_exists %}
                         <p>You already reviewed the item!</p>
@@ -141,7 +154,6 @@
                             {% csrf_token %}
                             {{ review_form.as_p }}
                             <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
-                            <button type="submit" name="delete_review" class="btn btn-success">Delete review</button>
                         </form>
                     {% endif %}
                 {% endif %}

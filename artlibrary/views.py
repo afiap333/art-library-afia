@@ -251,6 +251,7 @@ def collections(request):
     }
     return render(request, 'artlibrary/collections.html', context)
 
+@login_required
 def update_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
     itemsInCollection=collection.art_supplies.all()
@@ -277,6 +278,7 @@ def update_collection(request,id):
         collection.save()
     return render(request,'artlibrary/edit_collection.html',{'edit_collection_form':form,"itemsInCollection":itemsInCollection,"not_in_collection":not_in_collection})
 
+@login_required
 def delete_collection(request,id):
     collection = get_object_or_404(Collection, id=id)
     if request.method=='POST':
@@ -284,6 +286,7 @@ def delete_collection(request,id):
         return redirect('collections')
     return render(request,'artlibrary/delete_collection.html',{'collection':collection})
 
+@login_required
 def delete_item(request,id):
     supply = get_object_or_404(ArtSupply, id=id)
     if request.method=='POST':
@@ -291,6 +294,7 @@ def delete_item(request,id):
         return redirect('dashboard')
     return render(request,'artlibrary/delete_item.html')
 
+@login_required
 def edit_item(request, id):
     item = get_object_or_404(ArtSupply, id=id)
     all_collections = Collection.objects.all()
@@ -324,6 +328,7 @@ def edit_item(request, id):
         "in_private":in_private,
     })
 
+@login_required
 def add_collection(request):
     if request.method == "POST":
         print("Form submitted!")
@@ -374,7 +379,8 @@ def item_details(request,id):
         }
         return render(request, 'artlibrary/item_details.html', context)
     has_borrowed=False
-    if item.borrow_history and item in request.user.items_previously_borrowed.all():
+    print(item.borrow_history)
+    if item.borrow_history.filter(id=request.user.id).exists():
         has_borrowed=True
     item = get_object_or_404(ArtSupply, id=id)
     collections = Collection.objects.all()
@@ -382,6 +388,7 @@ def item_details(request,id):
     reviews=item.ratings.all()
     add_collection_form = AddCollectionForm(user=request.user)
     review_exists = item.ratings.filter(user=request.user).exists()
+    print(has_borrowed)
     if request.method == "POST":
         if "add_to_collection" in request.POST:
             add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
@@ -415,6 +422,7 @@ def item_details(request,id):
         'reviews':reviews,
         }
     return render(request, 'artlibrary/item_details.html', context)
+
 def manage_users(request):
     if(request.user.user_role!="librarian"):
         if request.user.user_role=="anonymous":
@@ -424,12 +432,15 @@ def manage_users(request):
     usersList= CustomUser.objects.all()
     context={'all_users':usersList}
     return render(request,'artlibrary/manage_users.html',context)
-    
+
+@login_required
 def make_librarian(request, id):
     userToUpgrade=get_object_or_404(CustomUser, id=id)
     userToUpgrade.user_role="librarian"
     userToUpgrade.save()
     return redirect("manage_users")
+
+@login_required
 def view_requests(request,id):
     collectionRequests=CollectionRequest.objects.filter(librarian__id=id).filter(is_approved=False)
     itemRequests=ArtSupplyRequest.objects.filter(librarian__id=id).filter(is_approved=False).filter(item__status="available")
@@ -441,6 +452,7 @@ def view_requests(request,id):
     }
     return render(request,'artlibrary/view_requests.html',context)
 
+@login_required
 def approve_collection_request(request,id):
     collectionRequest=get_object_or_404(CollectionRequest,id=id)
     collectionRequest.collection.users.add(collectionRequest.patron)
@@ -455,6 +467,8 @@ def approve_collection_request(request,id):
         email_subject,email_message,requestEmail,[recepientEmail],fail_silently=False,
     )
     return redirect("view_requests",id=request.user.id)
+
+@login_required
 def deny_collection_request(request,id):
     collectionRequest=get_object_or_404(CollectionRequest,id=id)
     requestEmail="artlibrary2025@gmail.com"
@@ -467,10 +481,12 @@ def deny_collection_request(request,id):
     collectionRequest.delete()
     return redirect("view_requests",id=request.user.id)
 
+@login_required
 def approve_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
     supplyRequest.item.borrowed_by=supplyRequest.patron
-    supplyRequest.item.borrow_history.add(request.user)
+    print(supplyRequest.patron)
+    supplyRequest.item.borrow_history.add(supplyRequest.patron)
     supplyRequest.item.status="checked_out"
     supplyRequest.is_approved=True
     supplyRequest.item.save()
@@ -484,6 +500,7 @@ def approve_item_request(request,id):
     )
     return redirect("view_requests",id=request.user.id)
 
+@login_required
 def deny_item_request(request,id):
     supplyRequest=get_object_or_404(ArtSupplyRequest,id=id)
     requestEmail="artlibrary2025@gmail.com"
@@ -496,6 +513,7 @@ def deny_item_request(request,id):
     supplyRequest.delete()
     return redirect("view_requests",id=request.user.id)
 
+@login_required
 def request_collection(request,id):
     collectionRequested=get_object_or_404(Collection,id=id)
     existing_request = CollectionRequest.objects.filter(collection=collectionRequested, patron=request.user).first()
@@ -542,6 +560,7 @@ def collection_details(request,id):
     }
     return render(request, 'artlibrary/collection_details.html', context)
 
+@login_required
 def borrow_item(request,id):
     itemToBorrow=get_object_or_404(ArtSupply,id=id)
     borrow_form=BorrowForm()
@@ -568,6 +587,7 @@ def borrow_item(request,id):
     context={"item":itemToBorrow,"borrow_form":borrow_form}
     return render(request, 'artlibrary/borrow_item.html',context)
 
+@login_required
 def return_item(request,id):
     itemToReturn=get_object_or_404(ArtSupply,id=id)
     itemToReturn.borrowed_by=None
@@ -575,6 +595,7 @@ def return_item(request,id):
     itemToReturn.save()
     return redirect("view_requests",id=request.user.id)
 
+@login_required
 def borrowed_items(request):
     available_items = ArtSupply.objects.filter(borrowed_by=request.user)
     pending_requests=ArtSupplyRequest.objects.filter(patron=request.user).filter(is_approved=False)
@@ -596,6 +617,7 @@ def borrowed_items(request):
     }
     return render(request, 'artlibrary/borrowed_items.html', context)
 
+@login_required
 def edit_review(request, review_id):
     review = get_object_or_404(Reviews, id=review_id, user=request.user)
 
@@ -607,12 +629,13 @@ def edit_review(request, review_id):
         form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             form.save()
-            return redirect('item_details', item_id=review.item.id)
+            return redirect('item_details', id=review.item.id)
     else:
         form = ReviewForm(instance=review)
 
-    return render(request, 'edit_review.html', {'form': form})
+    return render(request, 'artlibrary/edit_review.html', {'form': form, 'review':review})
 
+@login_required
 def delete_review(request, review_id):
     review = get_object_or_404(Reviews, id=review_id)
 
@@ -627,6 +650,7 @@ def delete_review(request, review_id):
 
     return render(request, 'artlibrary/confirm_delete.html', {'review': review})
 
+@login_required
 def alphabetize_items(request):
     if request.user.user_role == 'anonymous':
         return redirect('artlibrary')
