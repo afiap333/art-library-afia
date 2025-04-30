@@ -145,7 +145,7 @@
         <!-- Review Form -->
         <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
-                {% if has_borrowed %}
+                {% if has_borrowed and user.is_authenticated %}
                 <h2>Review Item</h2>
                     {% if review_exists %}
                         <p>You already reviewed the item!</p>
