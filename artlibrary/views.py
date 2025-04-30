@@ -685,3 +685,114 @@ def alphabetize_items(request):
         'query': query,
     }
     return render(request, 'artlibrary/dashboard.html', context)
+
+def anonymous_item_details(request,id):
+    item = get_object_or_404(ArtSupply, id=id)
+    collections = Collection.objects.all()
+    reviews=item.ratings.all()
+    if isinstance(request.user, AnonymousUser):
+        context = {
+        'item': item,
+        'collections': collections,
+        'reviews':reviews,
+        }
+        return render(request, 'artlibrary/anonymous_item_details.html', context)
+    has_borrowed=False
+    print(item.borrow_history)
+    if item.borrow_history.filter(id=request.user.id).exists():
+        has_borrowed=True
+    item = get_object_or_404(ArtSupply, id=id)
+    collections = Collection.objects.all()
+    review_form=ReviewForm()
+    reviews=item.ratings.all()
+    add_collection_form = AddCollectionForm(user=request.user)
+    review_exists = item.ratings.filter(user=request.user).exists()
+    print(has_borrowed)
+    if request.method == "POST":
+        if "add_to_collection" in request.POST:
+            add_collection_form = AddCollectionForm(request.POST, request.FILES, user=request.user)
+            if add_collection_form.is_valid():
+                collection_ids = request.POST.getlist('collections')  # Get selected collections
+                selected_collections = Collection.objects.filter(id__in=collection_ids)
+                for collection in selected_collections:
+                    collection.items.add(item)  # Add item to each selected collection
+                return redirect('anonymous_item_details', id=id)
+    if "submit_review" in request.POST:
+        review_form=ReviewForm(request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.item=item
+            review.user=request.user
+            review.save()
+            return redirect('anonymous_item_details',id=id)
+    context = {
+        'add_collection_form': add_collection_form,
+        'review_form':review_form,
+        'item': item,
+        'collections': collections,
+        'reviews':reviews,
+        'review_exists':review_exists,
+        'has_borrowed':has_borrowed,
+    }
+    if(request.user.user_role=="anonymous"):
+        context = {
+        'item': item,
+        'collections': collections,
+        'reviews':reviews,
+        }
+    return render(request, 'artlibrary/anonymous_item_details.html', context)
+
+def anonymous_collections(request):
+    user_role = request.session.get('user_role')
+    if not user_role and request.user.is_authenticated:
+        user_role = getattr(request.user, 'user_role', 'patron')
+
+    if user_role == "anonymous":
+        viewable_collections = Collection.objects.filter(is_public=True)
+    else:
+        viewable_collections = Collection.objects.all()
+    for collection in Collection.objects.all():
+        collection.update_num_items()
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        viewable_collections = viewable_collections.filter(title__icontains=query)
+
+    context = {
+        'user_role': user_role,
+        'viewable_collections': viewable_collections,
+        'query': query,
+    }
+    return render(request, 'artlibrary/anonymous_collections.html', context)
+
+def anonymous_collection_details(request,id):
+    user_role = request.session.get('user_role')
+    if not user_role and request.user.is_authenticated:
+        user_role = getattr(request.user, 'user_role', 'patron')
+
+    collectionRequested=get_object_or_404(Collection,id=id)
+    available_items=ArtSupply.objects.filter(collections_in=collectionRequested).filter(status="available")
+    context = {
+        'user_role': user_role,
+        'collection':collectionRequested,
+        'available_items': available_items,
+    }
+
+    query = request.GET.get('query', '')
+    
+    print(query)
+
+    if query:
+        available_items = ArtSupply.objects.filter(collections_in=collectionRequested, name__icontains=query)
+
+    context = {
+        'user_role': user_role,
+        'available_items': available_items,
+        'collections': collections,
+        'query': query,
+        'collectionRequested': collectionRequested,
+    }
+    return render(request, 'artlibrary/anonymous_collection_details.html', context)

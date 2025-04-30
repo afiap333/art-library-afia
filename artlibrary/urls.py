@@ -46,4 +46,8 @@ urlpatterns = [
     path('review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     #path('items/<int:item_id>/', views.item_details, name='item_details'),  # used in cancel button
 
+    path('<int:id>/anonymous_collection_details/',views.anonymous_collection_details,name="anonymous_collection_details"),
+    path('anonymous_collections/', views.anonymous_collections, name='anonymous_collections'),
+    path('<int:id>/anonymous_item_details/',views.anonymous_item_details,name="anonymous_item_details"),
+
 ]
