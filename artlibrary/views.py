@@ -179,7 +179,7 @@ def anonymous_page(request):
     print(query)
 
     if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
+        available_items = available_items.filter(name__icontains=query)
 
     context = {
         'user':user,
