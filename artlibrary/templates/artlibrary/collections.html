@@ -68,7 +68,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {% if user_role != "anonymous" %}
+                    {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
@@ -76,21 +76,21 @@
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
                     {% endif %}
-                    {% if user_role != "anonymous" %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-                    {% if user_role != "anonymous" %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
                     {% endif %}
-                    {% if user_role == "anonymous" %}
+                    {% if not user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
                     {% endif %}
                     {% if request.user.user_role == "librarian" %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
                     {% endif %}
-                    {% if user_role != "anonymous" %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
                     {% endif %}
                     <li class="nav-item">
@@ -172,7 +172,7 @@
                                 {% else %}
                                 <a href="{% url 'collection_details' collection.id %}" class="btn btn-brown">View collection</a>
                                 {% endif %}
-                                {% if collection.added_by.id == request.user.id and user_role != "anonymous" %}
+                                {% if collection.added_by.id == request.user.id and user.is_authenticated %}
                                     <a href="{% url 'edit_collection' collection.id %}" class="btn btn-warning">Edit</a>
                                     <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
                                 {% elif request.user.user_role == "librarian" %}
