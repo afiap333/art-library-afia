@@ -5,190 +5,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Details</title>
+    <title>Patron Dashboard</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <style>
         :root {
             --bs-primary: #8B5A2B;
+            --bs-primary-rgb: 139, 90, 43;
             --bs-secondary: #A67C52;
+            --bs-secondary-rgb: 166, 124, 82;
             --bs-dark: #5D4037;
         }
-
+        
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
+        
         .main-content {
             flex: 1;
         }
-
+        
         .bg-brown {
             background-color: #8B5A2B !important;
         }
-
+        
         .text-brown {
             color: #8B5A2B !important;
         }
-
+        
         .btn-brown {
             background-color: #8B5A2B;
             border-color: #8B5A2B;
             color: white;
         }
-
+        
         .btn-outline-brown {
             border-color: #8B5A2B;
             color: #8B5A2B;
         }
-
+        
         .btn-outline-brown:hover {
             background-color: #8B5A2B;
             color: white;
         }
-
+        
         .card-img-top {
             height: 180px;
             object-fit: cover;
         }
-
-        footer a {
-            font-size: 10px;
-        }
     </style>
 </head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-brown">
+    <div class="container">
+        <a class="navbar-brand" href="#">Item details</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
+            {% endif %}
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
+                {% endif %}
+                {% if request.user.user_role == "librarian" %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
+                    {% endif %}
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <body class="bg-light">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-brown">
-        <div class="container">
-            <a class="navbar-brand" href="#">Item Details</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'anonymous_page' %}">Home</a></li>
-                    {% endif %}
 
-                    {% if request.user.user_role == "librarian" %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'add_item' %}">Add Item</a></li>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'add_collection' %}">Add Collection</a></li>
-                    {% endif %}
-
-                    <li class="nav-item"><a class="nav-link" href="{% url 'collections' %}">Collections</a></li>
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'borrowed_items' %}">Borrowed Items</a></li>
-                    {% endif %}
-
-                    {% if request.user.user_role == "librarian" %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'view_requests' user.id %}">Requests</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a></li>
-                    {% endif %}
-
-                    {% if not user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Create an account</a></li>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
-                    {% endif %}
-
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Item Details -->
-    <main class="container my-5">
+    <!-- Available Art Supplies -->
+    <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow">
-                    {% if item.image %}
-                        <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-                    {% endif %}
-                    <div class="card-body text-center">
-                        <h4 class="text-brown">{{ item.name }}</h4>
-                        {% if item.status == "checked_out" %}
+            <div class="col-md-8 col-lg-6 text-center">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" class="img-fluid mb-3" alt="{{ item.name }}">
+                {% endif %}
+                <h5 class="card-title text-brown">{{ item.name }}</h5>
+                {% if item.status == "checked_out" %}
                             <span class="badge bg-warning">Checked out</span>
-                        {% else %}
+                            {% else %}
                             <span class="badge bg-success">Available</span>
-                        {% endif %}
-
-                        <hr>
-
-                        {% if item.quantity %}
-                            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-                        {% endif %}
-                        {% if item.pickup_location %}
-                            <p><strong>Pickup at:</strong> {{ item.pickup_location }}</p>
-                        {% endif %}
-                        {% if item.use_policy %}
-                            <p><strong>Use policy:</strong> {{ item.use_policy }}</p>
-                        {% endif %}
-                        {% if item.description %}
-                            <p><strong>Description:</strong> {{ item.description }}</p>
-                        {% endif %}
-                        {% if item.item_type %}
-                            <p><strong>Use type:</strong> {{ item.item_type }}-use</p>
-                        {% endif %}
-
-                        <div class="d-flex justify-content-center gap-2 mt-3">
-                            {% if item.status == "available" and user.is_authenticated %}
-                                <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
                             {% endif %}
-                            {% if request.user.user_role == "librarian" %}
-                                <a href="{% url 'edit_item' item.id %}" class="btn btn-outline-brown">Edit</a>
-                                <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
-                            {% endif %}
-                        </div>
+                {% if item.quantity %}
+                    <h6>Quantity</h6>
+                    <p>{{ item.quantity }}</p>
+                {% endif %}
+                {% if item.pickup_location %}
+                    <p class="card-text"><strong>Pickup at:</strong> {{ item.pickup_location }}</p>
+                {% endif %}
+                {% if item.use_policy %}
+                    <p class="card-text"><strong>Use policy:</strong> {{ item.use_policy }}</p>
+                {% endif %}
+                {% if item.description %}
+                    <p class="card-text"><strong>Description:</strong> {{ item.description }}</p>
+                {% endif %}
+                {% if item.item_type %}
+                    <p class="card-text"><strong>Use type:</strong> {{ item.item_type }}-use</p>
+                {% endif %}
+                <div class="row mt-3 g-2 justify-content-center">
+                    <div class="col-6">
+                        {% if item.status == "available" and user.is_authenticated %}
+                        <a href="{% url 'borrow_item' item.id %}" class="btn btn-brown">Borrow</a>
+                        {% endif %}
+                        {% if request.user.user_role == "librarian" %}
+                        <a href="{% url 'edit_item' item.id %}" class="btn btn-brown">Edit</a>
+                        <a href="{% url 'delete_item' item.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Review Form -->
-        {% if has_borrowed %}
-        <div class="row justify-content-center mt-5">
+        <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Review Item</h5>
-                        {% if review_exists %}
-                            <p>You already reviewed this item.</p>
-                        {% else %}
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                {{ review_form.as_p }}
-                                <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
+                {% if has_borrowed and user.is_authenticated %}
+                <h2>Review Item</h2>
+                    {% if review_exists %}
+                        <p>You already reviewed the item!</p>
+                    {% else %}
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ review_form.as_p }}
+                            <button type="submit" name="submit_review" class="btn btn-success">Submit review</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
-        {% endif %}
-
         <!-- Reviews -->
         <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
-                <h4 class="mb-3">Reviews</h4>
+                <h3>Reviews</h3>
                 {% for review in reviews %}
-                    <div class="card mb-3 shadow-sm">
+                    <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <strong>Review by {{ review.user }}</strong>
+                            <h5 class="card-title mb-0">Review by {{ review.user }}</h5>
                             {% if review.user == request.user %}
                                 <div>
                                     <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
@@ -197,8 +175,8 @@
                             {% endif %}
                         </div>
                         <div class="card-body">
-                            <p class="mb-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
-                            <p>{{ review.comment }}</p>
+                            <h6 class="card-subtitle mb-2 text-muted">Rating: {{ review.rating }}/5</h6>
+                            <p class="card-text">{{ review.comment }}</p>
                         </div>
                     </div>
                 {% empty %}
@@ -206,19 +184,17 @@
                 {% endfor %}
             </div>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="py-3 text-white mt-auto bg-brown">
+    </div>
+    <footer class="py-3 bg-dark text-white mt-auto bg-brown">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
                     <p class="mb-0">&copy; 2025 Art Supplies. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <a href="#" class="text-white text-decoration-none me-3">This is a class project</a>
-                    <a href="#" class="text-white text-decoration-none me-3">This system is not monitored</a>
-                    <a href="#" class="text-white text-decoration-none">Do not submit real info</a>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This is a class project</a>
+                    <a href="#" class="text-white text-decoration-none me-3" style="font-size: 10px;">This system is not monitored</a>
+                    <a href="#" class="text-white text-decoration-none" style="font-size: 10px;">Not real information should be submitted</a>
                 </div>
             </div>
         </div>

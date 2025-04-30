@@ -179,7 +179,7 @@ def anonymous_page(request):
     print(query)
 
     if query:
-        available_items = ArtSupply.objects.filter(name__icontains=query)
+        available_items = available_items.filter(name__icontains=query)
 
     context = {
         'user':user,
@@ -210,10 +210,19 @@ def patron_page(request):
 def profile(request):
     return render(request,'artlibrary/userprofile.html')
 
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+import urllib.parse  # ✅ Make sure this is imported
+
 def logout_view(request):
     logout(request)
     request.session.flush()
-    return redirect('index')
+
+    redirect_uri = 'https://art-library-871f7414fac3.herokuapp.com/'
+    continue_url = f"https://appengine.google.com/_ah/logout?continue={urllib.parse.quote(redirect_uri)}"
+    google_logout_url = f"https://accounts.google.com/Logout?continue={urllib.parse.quote(continue_url)}"
+
+    return redirect(google_logout_url)
 
 class CustomGoogleOAuth2Adapter(BaseGoogleOAuth2Adapter):
     def get_auth_params(self, request, action):
